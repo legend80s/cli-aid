@@ -19,4 +19,4 @@
 
 ## Use
 
-READ [src/CLI.test.js](https://github.com/legend80s/cli-aid/blob/main/src/CLI.test.js)
+READ [src/CLI.test.js](https://github.com/legend80s/cli-aid/blob/main/src/CLI.test.js).
