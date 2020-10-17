@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/legend80s/cli-aid#readme",
   "devDependencies": {
+    "git-commit-msg-linter": "^3.0.0",
     "jest": "^26.5.3"
   }
 }
