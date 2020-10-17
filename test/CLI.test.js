@@ -1,4 +1,4 @@
-const { CLI } = require('./CLI');
+const { CLI } = require('../src/CLI');
 
 describe('CLI', () => {
   test('should parse as expected on minimal settings', () => {
