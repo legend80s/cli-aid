@@ -151,9 +151,6 @@ function isCmdArg(arg) {
   return arg.startsWith('-') || arg.includes('=');
 }
 
-
 function not(fn) {
-  return (...args) => {
-    return !fn(...args);
-  };
+  return (...args) => !fn(...args);
 }
