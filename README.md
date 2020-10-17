@@ -48,4 +48,4 @@ OPTIONS
 tinify-client/2.0.0 darwin-x64 node-v12.8.1
 ```
 
-READ more options in [src/CLI.test.js](https://github.com/legend80s/cli-aid/blob/main/src/CLI.test.js).
+READ more options in [CLI.test.js](https://github.com/legend80s/cli-aid/blob/main/test/CLI.test.js).
