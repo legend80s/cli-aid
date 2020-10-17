@@ -19,7 +19,7 @@
 
 ## Use
 
-[github demo](https://github.com/legend80s/cli-aid-demo/blob/main/index.js).
+[github demo](https://github.com/legend80s/cli-aid-demo).
 
 ```javascript
 // index.js
