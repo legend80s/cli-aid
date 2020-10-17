@@ -101,7 +101,7 @@ exports.CLI = class CLI {
     console.log(`\n${BOLD}USAGE${EOS}`);
     console.log(this.usageTips);
     console.log('');
-    console.log(`\n${BOLD}OPTIONS${EOS}`);
+    console.log(`${BOLD}OPTIONS${EOS}`);
 
     for (const option of this.schema) {
       const [key, ...alias] = option.filter(isString);
