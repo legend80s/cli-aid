@@ -86,7 +86,7 @@ describe('CLI', () => {
     expect(actual).toEqual(expected)
   });
 
-  test('should show version tips as expected', () => {
+  test('should show version tips as expected when name and version passed', () => {
     const cli = new CLI({ name: 'cli-aid', version: '2.0.0' })
     const actual = cli.parse();
 
@@ -98,5 +98,35 @@ describe('CLI', () => {
 
     expect(actual).toEqual(expected)
     expect(cli.versionTips).toEqual(`cli-aid/2.0.0 ${process.platform}-${process.arch} node-${process.version}`)
+  });
+
+  test('should show version tips as expected when package.json passed', () => {
+    const cli = new CLI()
+      .package({ name: 'cli-aid', version: '2.0.0' });
+
+    const actual = cli.parse();
+
+    const expected = new Map([
+      ['help', false],
+      ['version', false],
+      ['rest', []],
+    ]);
+
+    expect(actual).toEqual(expected)
+    expect(cli.versionTips).toEqual(`cli-aid/2.0.0 ${process.platform}-${process.arch} node-${process.version}`)
+  });
+
+  test('should show version tips as expected when name and version not passed', () => {
+    const cli = new CLI();
+    const actual = cli.parse();
+
+    const expected = new Map([
+      ['help', false],
+      ['version', false],
+      ['rest', []],
+    ]);
+
+    expect(actual).toEqual(expected)
+    expect(cli.versionTips).toEqual(`${process.platform}-${process.arch} node-${process.version}`)
   });
 });
