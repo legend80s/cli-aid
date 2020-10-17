@@ -19,4 +19,33 @@
 
 ## Use
 
-READ [src/CLI.test.js](https://github.com/legend80s/cli-aid/blob/main/src/CLI.test.js).
+[github demo](https://github.com/legend80s/cli-aid-demo/blob/main/index.js).
+
+```javascript
+// index.js
+const { CLI } = require('cli-aid');
+
+new CLI({ name: 'tinify-client', version: '2.0.0' })
+  .option('max-count', 'm', { to: CLI.toNumber, defaultVal: 15, help: 'The max compressing turns. Default 15.' })
+  .parse();
+```
+
+`node index.js -h`
+
+```
+USAGE
+ $ tinify-client
+
+OPTIONS
+ - help [h|docs|文档]: Show this help information.
+ - version [v]: Show the version information.
+ - max-count [m]: The max compressing turns. Default 15.
+```
+
+`node index.js -v`
+
+```sh
+tinify-client/2.0.0 darwin-x64 node-v12.8.1
+```
+
+READ more options in [src/CLI.test.js](https://github.com/legend80s/cli-aid/blob/main/src/CLI.test.js).
