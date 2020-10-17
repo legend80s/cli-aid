@@ -25,19 +25,52 @@ exports.CLI = class CLI {
 
     this.parsed = new Map();
 
-    /**
-     * @private
-     */
-    this.usageTips = name ? `$ ${name}` : '';
+    const packageInfo = { name, version };
 
-    /**
-     * @public
-     */
-    this.versionTips = `${name}/${version} ${process.platform}-${process.arch} node-${process.version}`;
+    this
+      .setUsageTips(packageInfo)
+      .setVersion(packageInfo);
   }
 
   /**
+   * set package.json
+   * @public
+   * @param {{ name: string; version: string }} packageInfo
+   * @returns {CLI}
+   */
+  package(packageInfo) {
+    this.setVersion(packageInfo);
+
+    return this;
+  }
+
+  /**
+   * @private
+   * @param {{ name: string }}
+   * @returns {CLI}
+   */
+  setUsageTips({ name }) {
+    this.usageTips = name ? `$ ${name}` : '';
+
+    return this;
+  }
+
+  /**
+   * @param {{ name: string; version: string; }}
+   * @returns {CLI}
+   */
+  setVersion({ name, version }) {
+    this.versionTips = (name ? `${name}/${version || ''} ` : '') +
+      `${process.platform}-${process.arch} node-${process.version}`
+
+    return this;
+  }
+
+  /**
+   * set usage tips
+   * @public
    * @param {string} tips
+   * @returns {CLI}
    */
   usage(tips) {
     this.usageTips = tips;
@@ -47,6 +80,7 @@ exports.CLI = class CLI {
 
   /**
    * @param {[...string[], { to: (obj: any) => any; defaultVal: any; }]} schemaEntry
+   * @returns {CLI}
    */
   option(...schemaEntry) {
     this.schema.push([...schemaEntry])
@@ -56,6 +90,7 @@ exports.CLI = class CLI {
 
   /**
    * @param {string[]} argv
+   * @returns {Map<string, any>}
    */
   parse(argv = []) {
     const parsed = argv
@@ -87,22 +122,24 @@ exports.CLI = class CLI {
    */
   after() {
     if (this.parsed.get('help')) {
-      this.help();
+      this.showHelp();
 
       process.exit(0);
     }
 
     if (this.parsed.get('version')) {
-      this.version();
+      this.showVersion();
 
       process.exit(0);
     }
+
+    return this;
   }
 
   /**
    * @private
    */
-  help() {
+  showHelp() {
     if (this.usageTips) {
       console.log(`\n${BOLD}USAGE${EOS}`);
       console.log(` ${this.usageTips}`);
@@ -128,7 +165,7 @@ exports.CLI = class CLI {
   /**
    * @private
    */
-  version() {
+  showVersion() {
     console.log(this.versionTips)
   }
 
