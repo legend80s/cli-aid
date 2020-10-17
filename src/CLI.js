@@ -12,17 +12,14 @@ exports.CLI = class CLI {
    * @type {Array<[...string[], { to: (obj: any) => any; defaultVal: any; help: string; }]>}
    */
   static defaultSchema = [
-    ['help', 'h', 'docs', '文档', { to: CLI.toBoolean, defaultVal: false, help: 'Show this help information' }],
-    ['version', 'v', { to: CLI.toBoolean, defaultVal: false, help: 'Show the version' }],
+    ['help', 'h', 'docs', '文档', { to: CLI.toBoolean, defaultVal: false, help: 'Show this help information.' }],
+    ['version', 'v', { to: CLI.toBoolean, defaultVal: false, help: 'Show the version information' }],
   ]
 
   /**
-   * @param {string[]} argv
-   * @param {[...string[], { to: (obj: any) => any; defaultVal: any; }]} schema
+   * @param {{ name: string; version: string; schema: [...string[], { to: (obj: any) => any; defaultVal: any; }]; }} options
    */
-  constructor(argv = [], schema = []) {
-    this.argv = argv;
-
+  constructor({ name, version, schema = [] } = {}) {
     /** @type {Array<[...string[], { to: (obj: any) => any; defaultVal: any; help: string; }]>} */
     this.schema = [...CLI.defaultSchema, ...schema];
 
@@ -31,7 +28,12 @@ exports.CLI = class CLI {
     /**
      * @private
      */
-    this.usageTips = '';
+    this.usageTips = name ? `$ ${name}` : '';
+
+    /**
+     * @public
+     */
+    this.versionTips = `${name}/${version} ${process.platform}-${process.arch} node-${process.version}`;
   }
 
   /**
@@ -52,8 +54,11 @@ exports.CLI = class CLI {
     return this;
   }
 
-  parse() {
-    const parsed = this.argv
+  /**
+   * @param {string[]} argv
+   */
+  parse(argv = []) {
+    const parsed = argv
       // collect the args prefixed with '-' or '--' or '=' as cmd
       .filter(isCmdArg)
       .map(entry => {
@@ -68,7 +73,7 @@ exports.CLI = class CLI {
     const argEntries = this.parseAgainstSchema(parsed);
 
     // collect the none-cmd args as rest
-    argEntries.push(['rest', this.argv.filter(not(isCmdArg))])
+    argEntries.push(['rest', argv.filter(not(isCmdArg))])
 
     this.parsed = new Map(argEntries);
 
@@ -98,8 +103,11 @@ exports.CLI = class CLI {
    * @private
    */
   help() {
-    console.log(`\n${BOLD}USAGE${EOS}`);
-    console.log(this.usageTips);
+    if (this.usageTips) {
+      console.log(`\n${BOLD}USAGE${EOS}`);
+      console.log(` ${this.usageTips}`);
+    }
+
     console.log('');
     console.log(`${BOLD}OPTIONS${EOS}`);
 
@@ -121,9 +129,7 @@ exports.CLI = class CLI {
    * @private
    */
   version() {
-    const { name, version } = require('../../package.json');
-
-    console.log(`${name}/${version} ${process.platform}-${process.arch} node-${process.version}`)
+    console.log(this.versionTips)
   }
 
   /**
