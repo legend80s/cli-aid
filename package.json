@@ -1,0 +1,26 @@
+{
+  "name": "cli-aid",
+  "version": "0.0.0",
+  "description": "Lightweight CLI-App maker with 0 dependencies",
+  "main": "./src/CLI.js",
+  "files": [
+    "src/*"
+  ],
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/legend80s/cli-aid.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/legend80s/cli-aid/issues"
+  },
+  "homepage": "https://github.com/legend80s/cli-aid#readme",
+  "devDependencies": {
+    "jest": "^26.5.3"
+  }
+}
