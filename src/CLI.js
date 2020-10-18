@@ -103,7 +103,7 @@ exports.CLI = class CLI {
    * Add command.
    * @param cmd
    * @param {{ help: string; usage: string; }} options
-   * @param {(options: Map<string, string | number | boolean>) => void} execute
+   * @param {(options: Map<string, string | number | boolean | string[]>) => void} execute
    */
   command(cmd = '', options, execute = () => {}) {
     if (!cmd || !isString(cmd)) {
@@ -179,9 +179,9 @@ exports.CLI = class CLI {
       process.exit(0);
     }
 
-    this.commands
-      .filter(cmd => this.isCmdPassed(cmd))
-      .forEach(cmd => cmd.execute(parsed));
+    const cmd = this.commands.find(cmd => this.isCmdPassed(cmd))
+
+    cmd && cmd.execute(parsed);
 
     return this;
   }
