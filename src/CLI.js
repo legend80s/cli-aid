@@ -1,5 +1,6 @@
 const { GREEN, EOS, BOLD } = require('./constants/colors')
 const { last, isString, isFunction, isRemoteFile } = require('./utils/lite-lodash')
+const { minimist } = require('./utils/minimist')
 
 exports.CLI = class CLI {
   static toString = String
@@ -9,18 +10,18 @@ exports.CLI = class CLI {
   static defaultTransformer = String
 
   /**
-   * @type {Array<[...string[], { to: (obj: any) => any; defaultVal: any; help: string; }]>}
+   * @type {Array<[...string[], { defaultVal: any; help: string; }]>}
    */
   static defaultSchema = [
-    ['help', 'h', 'docs', '文档', { to: CLI.toBoolean, defaultVal: false, help: 'Show this help information.' }],
-    ['version', 'v', { to: CLI.toBoolean, defaultVal: false, help: 'Show the version information.' }],
+    ['help', 'h', 'docs', '文档', { defaultVal: false, help: 'Show this help information.' }],
+    ['version', 'v', { defaultVal: false, help: 'Show the version information.' }],
   ]
 
   /**
-   * @param {{ name: string; version: string; schema: [...string[], { to: (obj: any) => any; defaultVal: any; }]; }} options
+   * @param {{ name: string; version: string; schema: [...string[], { defaultVal: any; }]; }} options
    */
   constructor({ name, version, schema = [] } = {}) {
-    /** @type {Array<[...string[], { to: (obj: any) => any; defaultVal: any; help: string; }]>} */
+    /** @type {Array<[...string[], { defaultVal: any; help: string; }]>} */
     this.schema = [...CLI.defaultSchema, ...schema];
 
     /** @type {Map<string, string | number | boolean>} */
@@ -90,7 +91,7 @@ exports.CLI = class CLI {
   }
 
   /**
-   * @param {[...string[], { to: (obj: any) => any; defaultVal: any; }]} schemaEntry
+   * @param {[...string[], { defaultVal: any; }]} schemaEntry
    * @returns {CLI}
    */
   option(...schemaEntry) {
@@ -138,31 +139,31 @@ exports.CLI = class CLI {
    * @returns {Map<string, string | number | boolean>}
    */
   parse(argv = []) {
-    const parsed = argv
-      // collect the args prefixed with '-' or '--' or '=' as cmd
-      .filter(isCmdArg)
-      .map(entry => {
-        // console.log('entry:', entry);
-        const splits = entry.match(/([^=]+)=?(.*)/);
-
-        // console.log('splits:', splits);
-
-        const key = splits[1].replace(/^-+/, '').trim();
-        const val = splits[2].trim();
-
-        return [key, val]
-      });
-
+    const parsed = minimist(argv);
     const argEntries = this.parseAgainstSchema(parsed);
 
-    // collect the none-cmd args as rest
-    argEntries.push(['rest', argv.filter(not(isCmdArg))])
-
-    this.parsed = new Map(argEntries);
+    this.parsed = new Map([...argEntries, ['rest', parsed.rest]]);
 
     this.after(this.parsed);
 
     return this.parsed;
+  }
+
+  /**
+   * @private
+   * @param {Array<[key: string, val: string]>} parsedEntries
+   */
+  parseAgainstSchema(parsedEntries) {
+    return this.schema.reduce((acc, option) => {
+      const [_, val] = parsedEntries.find(([ key ]) => option.includes(key)) || [];
+
+      const { defaultVal } = last(option);
+      const [ normalizedKey ] = option;
+
+      acc.push([ normalizedKey, typeof val === 'undefined' ? defaultVal : val ]);
+
+      return acc;
+    }, []);
   }
 
   /**
@@ -276,32 +277,4 @@ exports.CLI = class CLI {
   showVersion() {
     console.log(this.versionTips)
   }
-
-  /**
-   * @private
-   * @param {Array<[key: string, val: string]>} argEntries
-   */
-  parseAgainstSchema(argEntries) {
-    return this.schema.reduce((acc, option) => {
-      const [_, val] = argEntries.find(([key]) => option.includes(key)) || [];
-
-      const { to = CLI.defaultTransformer, defaultVal } = last(option);
-      const [normalizedKey] = option;
-
-      acc.push([ normalizedKey, typeof val === 'undefined' ? defaultVal : to(val) ]);
-
-      return acc;
-    }, []);
-  }
-}
-
-/**
- * @param {string} arg
- */
-function isCmdArg(arg) {
-  return arg.startsWith('-') || (!isRemoteFile(arg) && arg.includes('='));
-}
-
-function not(fn) {
-  return (...args) => !fn(...args);
 }
