@@ -16,10 +16,10 @@ describe('CLI', () => {
 
   test('should parse as expected when fill schema with option method', () => {
     const actual = new CLI({ name: 'tinify-client', version: '2.0.0' })
-      .option('key', { to: CLI.toString, help: 'The Tinify key. Accessible at https://tinypng.com/developers.' })
-      .option('src', { to: CLI.toString, help: 'Image url or local image path to compress.' })
-      .option('output', 'o', { to: CLI.toString, help: 'The compressed image file path.' })
-      .option('max-count', 'm', { to: CLI.toNumber, defaultVal: 15, help: 'The max compressing turns. Default 15.' })
+      .option('key', { to: String, help: 'The Tinify key. Accessible at https://tinypng.com/developers.' })
+      .option('src', { to: String, help: 'Image url or local image path to compress.' })
+      .option('output', 'o', { to: String, help: 'The compressed image file path.' })
+      .option('max-count', 'm', { to: Number, defaultVal: 15, help: 'The max compressing turns. Default 15.' })
       .option('verbose', { to: CLI.toBoolean, defaultVal: false, help: 'Show more information about each compressing turn.' })
       .option('no-base64', { to: CLI.toBoolean, defaultVal: false, help: 'Not output the base64 of the compressed image. base64 encoded by default.' })
 
@@ -51,10 +51,10 @@ describe('CLI', () => {
 
   test('should parse as expected when fill schema directly in constructor', () => {
     const schema = [
-      ['key', { to: CLI.toString, help: 'The Tinify key. Accessible at https://tinypng.com/developers.' }],
-      ['src', { to: CLI.toString, help: 'Image url or local image path to compress.' }],
-      ['output', 'o', { to: CLI.toString, help: 'The compressed image file path.' }],
-      ['max-count', 'm', { to: CLI.toNumber, defaultVal: 15, help: 'The max compressing turns. Default 15.' }],
+      ['key', { to: String, help: 'The Tinify key. Accessible at https://tinypng.com/developers.' }],
+      ['src', { to: String, help: 'Image url or local image path to compress.' }],
+      ['output', 'o', { to: String, help: 'The compressed image file path.' }],
+      ['max-count', 'm', { to: Number, defaultVal: 15, help: 'The max compressing turns. Default 15.' }],
       ['verbose', { to: CLI.toBoolean, defaultVal: false, help: 'Show more information about each compressing turn.' }],
 
       ['no-base64', { to: CLI.toBoolean, defaultVal: false, help: 'Not output the base64 of the compressed image. base64 encoded by default.' }],
