@@ -260,8 +260,8 @@ exports.CLI = class CLI {
    * @private
    */
   showAllCommandUsageTips() {
-    const cmdTips = this.commands.map(({ cmd, usage }) => {
-      return ' $ ' + (`${this.packageInfo.name} ${cmd} --help`);
+    const cmdTips = this.commands.map(({ name }) => {
+      return ' $ ' + (`${this.packageInfo.name} ${name} --help`);
     }).join('\n');
 
     console.log(cmdTips);
