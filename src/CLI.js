@@ -1,5 +1,5 @@
 const { GREEN, EOS, BOLD } = require('./constants/colors')
-const { last, isString } = require('./utils/lite-lodash')
+const { last, isString, isFunction } = require('./utils/lite-lodash')
 
 exports.CLI = class CLI {
   static toString = String
@@ -23,9 +23,17 @@ exports.CLI = class CLI {
     /** @type {Array<[...string[], { to: (obj: any) => any; defaultVal: any; help: string; }]>} */
     this.schema = [...CLI.defaultSchema, ...schema];
 
+    /** @type {Map<string, string | number | boolean>} */
     this.parsed = new Map();
 
+    /**
+     * @type {Array<{ name: string; helpTips: string; execute: (options: IParsedOptions) => any }>}
+     */
+    this.commands = [];
+
     const packageInfo = { name, version };
+
+    this.packageInfo = packageInfo;
 
     this
       .setUsageTips(packageInfo)
@@ -39,6 +47,7 @@ exports.CLI = class CLI {
    * @returns {CLI}
    */
   package(packageInfo) {
+    this.packageInfo = packageInfo;
     this.setVersion(packageInfo);
 
     return this;
@@ -91,8 +100,42 @@ exports.CLI = class CLI {
   }
 
   /**
+   * Add command.
+   * @param cmd
+   * @param {{ help: string; usage: string; }} options
+   * @param {(options: Map<string, string | number | boolean>) => void} execute
+   */
+  command(cmd = '', options, execute = () => {}) {
+    if (!cmd || !isString(cmd)) {
+      console.warn('`cmd` not a string, command won\'t be executed');
+
+      return;
+    }
+
+    if (isFunction(options)) {
+      execute = options;
+    }
+
+    const command = {
+      name: cmd,
+      execute,
+    };
+
+    if (typeof options === 'object' && options) {
+      const { help = '', usage = '' } = options;
+
+      command.help = help;
+      command.usage = usage;
+    }
+
+    this.commands.push(command);
+
+    return this;
+  }
+
+  /**
    * @param {string[]} argv
-   * @returns {Map<string, any>}
+   * @returns {Map<string, string | number | boolean>}
    */
   parse(argv = []) {
     const parsed = argv
@@ -114,30 +157,41 @@ exports.CLI = class CLI {
 
     this.parsed = new Map(argEntries);
 
-    this.after(parsed);
+    this.after(this.parsed);
 
     return this.parsed;
   }
 
   /**
    * @private
+   * @param {Map<string, any>} parsed
    */
-  after() {
-    if (this.parsed.get('help')) {
+  after(parsed) {
+    if (parsed.get('help')) {
       this.showHelp();
 
       process.exit(0);
     }
 
-    if (this.parsed.get('version')) {
+    if (parsed.get('version')) {
       this.showVersion();
 
       process.exit(0);
     }
 
+    this.commands
+      .filter(cmd => this.isCmdPassed(cmd))
+      .forEach(cmd => cmd.execute(parsed));
+
     return this;
   }
 
+  /**
+   * @private
+   */
+  isCmdPassed(cmd) {
+    return this.parsed.get('rest').includes(cmd.name);
+  }
   /**
    * @private
    */
@@ -149,11 +203,28 @@ exports.CLI = class CLI {
    * @private
    */
   showHelp() {
+    // console.log('this.commands:', this.commands);
+    // console.log('this.parsed.get(rest):', this.parsed.get('rest'));
+
+    const cmd = this.commands.find(cmd =>
+      this.isCmdPassed(cmd)
+    );
+
+    // console.log('cmd:', cmd);
+
+    if (cmd) {
+      this.showCommandUsageTips(cmd)
+
+      return;
+    }
+
     this.showPkgVersion();
 
-    if (this.usageTips) {
+    if (this.commands.length || this.usageTips) {
       console.log(`\n${BOLD}USAGE${EOS}`);
       console.log(` ${this.usageTips}`);
+
+      this.showAllCommandUsageTips();
     }
 
     console.log('');
@@ -170,6 +241,30 @@ exports.CLI = class CLI {
     }
 
     console.log('');
+  }
+
+  /**
+   * @private
+   */
+  showCommandUsageTips(cmd) {
+    console.log(cmd.help);
+    console.log();
+
+    console.log(`${BOLD}USAGE${EOS}`);
+    console.log(' $', cmd.usage);
+
+    console.log();
+  }
+
+  /**
+   * @private
+   */
+  showAllCommandUsageTips() {
+    const cmdTips = this.commands.map(({ cmd, usage }) => {
+      return ' $ ' + (`${this.packageInfo.name} ${cmd} --help`);
+    }).join('\n');
+
+    console.log(cmdTips);
   }
 
   /**

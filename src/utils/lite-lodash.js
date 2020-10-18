@@ -7,10 +7,19 @@ exports.last = function last(arr) {
 }
 
 /**
- *
+ * isString
  * @param {any} obj
  * @returns {boolean}
  */
 exports.isString = function isString(obj) {
   return typeof obj === 'string';
+}
+
+/**
+ * isFunction
+ * @param {any} obj
+ * @returns {boolean}
+ */
+exports.isFunction = function isFunction(obj) {
+  return typeof obj === 'function';
 }
