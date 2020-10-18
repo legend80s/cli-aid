@@ -23,3 +23,8 @@ exports.isString = function isString(obj) {
 exports.isFunction = function isFunction(obj) {
   return typeof obj === 'function';
 }
+
+/**
+ * @param {string} path
+ */
+exports.isRemoteFile = (path) => /^https?:\/\//.test(path);

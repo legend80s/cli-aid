@@ -1,5 +1,5 @@
 const { GREEN, EOS, BOLD } = require('./constants/colors')
-const { last, isString, isFunction } = require('./utils/lite-lodash')
+const { last, isString, isFunction, isRemoteFile } = require('./utils/lite-lodash')
 
 exports.CLI = class CLI {
   static toString = String
@@ -142,7 +142,10 @@ exports.CLI = class CLI {
       // collect the args prefixed with '-' or '--' or '=' as cmd
       .filter(isCmdArg)
       .map(entry => {
+        // console.log('entry:', entry);
         const splits = entry.match(/([^=]+)=?(.*)/);
+
+        // console.log('splits:', splits);
 
         const key = splits[1].replace(/^-+/, '').trim();
         const val = splits[2].trim();
@@ -296,7 +299,7 @@ exports.CLI = class CLI {
  * @param {string} arg
  */
 function isCmdArg(arg) {
-  return arg.startsWith('-') || arg.includes('=');
+  return arg.startsWith('-') || (!isRemoteFile(arg) && arg.includes('='));
 }
 
 function not(fn) {
