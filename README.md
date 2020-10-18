@@ -19,33 +19,35 @@
 
 ## Use
 
-[github demo](https://github.com/legend80s/cli-aid-demo).
+[github demo/tinify-client-cli.js](https://github.com/legend80s/cli-aid/blob/main/demo/tinify-client-cli.js).
 
 ```javascript
-// index.js
-const { CLI } = require('cli-aid');
+// demo/tinify-client-cli.js
+const { CLI } = require('../src');
 
-new CLI({ name: 'tinify-client', version: '2.0.0' })
-  .option('max-count', 'm', { to: CLI.toNumber, defaultVal: 15, help: 'The max compressing turns. Default 15.' })
-  .parse();
+new CLI({ name: 'tinify-client-cli', version: '2.0.0' })
+  .option('max-count', 'm', { to: Number, defaultVal: 15, help: 'The max compressing turns. Default 15.' })
+  .parse(process.argv.slice(2));
 ```
 
-`node index.js -h`
+`node demo/tinify-client-cli.js --h`
 
 ```
+tinify-client-cli/2.0.0
+
 USAGE
- $ tinify-client
+ $ tinify-client-cli [OPTIONS]
 
 OPTIONS
- - help [h|docs|文档]: Show this help information.
- - version [v]: Show the version information.
- - max-count [m]: The max compressing turns. Default 15.
+ --help, -h, -docs, -文档: Show this help information.
+ --version, -v: Show the version information.
+ --max-count, -m: The max compressing turns. Default 15.
 ```
 
-`node index.js -v`
+`node demo/tinify-client-cli.js --v`
 
 ```sh
-tinify-client/2.0.0 darwin-x64 node-v12.8.1
+tinify-client-cli/2.0.0 darwin-x64 node-v12.8.1
 ```
 
 READ more options in [CLI.test.js](https://github.com/legend80s/cli-aid/blob/main/test/CLI.test.js).
