@@ -129,4 +129,54 @@ describe('CLI', () => {
     expect(actual).toEqual(expected)
     expect(cli.versionTips).toEqual(`${process.platform}-${process.arch} node-${process.version}`)
   });
+
+  test('should parse as expected on command set', () => {
+    let actualOptions;
+
+    const cli = new CLI()
+      .command('base64', {
+        usage: 'tinify-client-cli base64 IMG_URL_OR_LOCAL_IMG_PATH',
+        help: 'output base64-encoded string of the input image',
+      }, (options) => {
+        // console.log('output base64 with options:', options);
+
+        actualOptions = options;
+      });
+
+    const actual = cli.parse([ 'base64', 'https://example.com/example.png' ]);
+
+    const expected = new Map([
+      ['help', false],
+      ['version', false],
+      ['rest', ['base64', 'https://example.com/example.png']],
+    ]);
+
+    expect(actual).toEqual(expected);
+    expect(actualOptions).toEqual(expected);
+  });
+
+  test('should not execute on unknown command passed', () => {
+    let actualOptions = null;
+
+    const cli = new CLI()
+      .command('base64', {
+        usage: 'tinify-client-cli base64 IMG_URL_OR_LOCAL_IMG_PATH',
+        help: 'output base64-encoded string of the input image',
+      }, (options) => {
+        // console.log('output base64 with options:', options);
+
+        actualOptions = options;
+      });
+
+    const actual = cli.parse([ 'base64xyz', 'https://example.com/example.png' ]);
+
+    const expected = new Map([
+      ['help', false],
+      ['version', false],
+      ['rest', ['base64xyz', 'https://example.com/example.png']],
+    ]);
+
+    expect(actual).toEqual(expected);
+    expect(actualOptions).toEqual(null);
+  });
 });
