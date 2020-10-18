@@ -168,12 +168,20 @@ describe('CLI', () => {
         actualOptions = options;
       });
 
-    const actual = cli.parse([ 'base64xyz', 'https://example.com/example.png' ]);
+    const actual = cli.parse([
+      'base64xyz',
+      'https://s.gravatar.com/avatar/438e8984d73c7da54916acb86fb5fb7c?size=100&default=retro',
+    ]);
+
+    // console.log('info:', actual);
 
     const expected = new Map([
       ['help', false],
       ['version', false],
-      ['rest', ['base64xyz', 'https://example.com/example.png']],
+      ['rest', [
+        'base64xyz',
+        'https://s.gravatar.com/avatar/438e8984d73c7da54916acb86fb5fb7c?size=100&default=retro',
+      ]],
     ]);
 
     expect(actual).toEqual(expected);
