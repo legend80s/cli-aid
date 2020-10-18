@@ -8,7 +8,8 @@
   ],
   "scripts": {
     "prepublish": "npm test",
-    "test": "jest"
+    "test": "jest && npm run test:e2e",
+    "test:e2e": "node demo/tinify-client-cli.js -v && node demo/tinify-client-cli.js -h"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
   },
   "homepage": "https://github.com/legend80s/cli-aid#readme",
   "devDependencies": {
+    "@types/jest": "^26.0.14",
     "git-commit-msg-linter": "^3.0.0",
     "jest": "^26.5.3"
   }
