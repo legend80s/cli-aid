@@ -32,7 +32,7 @@ new CLI({ name: 'tinify-client-cli', version: '2.0.0' })
 
 `node demo/tinify-client-cli.js --h`
 
-```
+```text
 tinify-client-cli/2.0.0
 
 USAGE
@@ -50,4 +50,4 @@ OPTIONS
 tinify-client-cli/2.0.0 darwin-x64 node-v12.8.1
 ```
 
-READ more options in [CLI.test.js](https://github.com/legend80s/cli-aid/blob/main/test/CLI.test.js).
+READ more options in [CLI.test.js](https://github.com/legend80s/cli-aid/blob/main/test/CLI.test.js) and command in [demo/tinify-client-cli.js](https://github.com/legend80s/cli-aid/blob/main/demo/tinify-client-cli.js).
