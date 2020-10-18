@@ -16,14 +16,14 @@ describe('CLI', () => {
 
   test('should parse as expected when fill schema with option method', () => {
     const actual = new CLI({ name: 'tinify-client', version: '2.0.0' })
-      .option('key', { to: String, help: 'The Tinify key. Accessible at https://tinypng.com/developers.' })
-      .option('src', { to: String, help: 'Image url or local image path to compress.' })
-      .option('output', 'o', { to: String, help: 'The compressed image file path.' })
-      .option('max-count', 'm', { to: Number, defaultVal: 15, help: 'The max compressing turns. Default 15.' })
-      .option('verbose', { to: CLI.toBoolean, defaultVal: false, help: 'Show more information about each compressing turn.' })
-      .option('no-base64', { to: CLI.toBoolean, defaultVal: false, help: 'Not output the base64 of the compressed image. base64 encoded by default.' })
+      .option('key', { help: 'The Tinify key. Accessible at https://tinypng.com/developers.' })
+      .option('src', { help: 'Image url or local image path to compress.' })
+      .option('output', 'o', { help: 'The compressed image file path.' })
+      .option('max-count', 'm', { defaultVal: 15, help: 'The max compressing turns. Default 15.' })
+      .option('verbose', { defaultVal: false, help: 'Show more information about each compressing turn.' })
+      .option('no-base64', { defaultVal: false, help: 'Not output the base64 of the compressed image. base64 encoded by default.' })
 
-      .option('debug', { to: CLI.toBoolean, help: 'Show the parsed CLI params.' })
+      .option('debug', { help: 'Show the parsed CLI params.' })
 
       .parse([
         'https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ',
@@ -51,14 +51,13 @@ describe('CLI', () => {
 
   test('should parse as expected when fill schema directly in constructor', () => {
     const schema = [
-      ['key', { to: String, help: 'The Tinify key. Accessible at https://tinypng.com/developers.' }],
-      ['src', { to: String, help: 'Image url or local image path to compress.' }],
-      ['output', 'o', { to: String, help: 'The compressed image file path.' }],
-      ['max-count', 'm', { to: Number, defaultVal: 15, help: 'The max compressing turns. Default 15.' }],
-      ['verbose', { to: CLI.toBoolean, defaultVal: false, help: 'Show more information about each compressing turn.' }],
-
-      ['no-base64', { to: CLI.toBoolean, defaultVal: false, help: 'Not output the base64 of the compressed image. base64 encoded by default.' }],
-      ['debug', { to: CLI.toBoolean, help: 'Show the parsed CLI params.' }],
+      ['key', { help: 'The Tinify key. Accessible at https://tinypng.com/developers.' }],
+      ['src', { help: 'Image url or local image path to compress.' }],
+      ['output', 'o', { help: 'The compressed image file path.' }],
+      ['max-count', 'm', { defaultVal: 15, help: 'The max compressing turns. Default 15.' }],
+      ['verbose', { defaultVal: false, help: 'Show more information about each compressing turn.' }],
+      ['no-base64', { defaultVal: false, help: 'Not output the base64 of the compressed image. base64 encoded by default.' }],
+      ['debug', { help: 'Show the parsed CLI params.' }],
     ];
 
     const actual = new CLI({ name: 'cli-aid', version: '2.0.0', schema })
