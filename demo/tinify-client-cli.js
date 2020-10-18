@@ -3,7 +3,7 @@ const { CLI } = require('../src');
 // console.log('process.argv.slice(2):', process.argv.slice(2));
 
 new CLI({ name: 'tinify-client-cli', version: '2.0.0' })
-  .option('max-count', 'm', { to: Number, defaultVal: 15, help: 'The max compressing turns. Default 15.' })
+  .option('max-count', 'm', { defaultVal: 15, help: 'The max compressing turns. Default 15.' })
   .command('base64', {
     usage: 'tinify-client-cli base64 IMG_URL_OR_LOCAL_IMG_PATH',
     help: 'output base64-encoded string of the input image',
