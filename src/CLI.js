@@ -264,7 +264,7 @@ exports.CLI = class CLI {
       return ' $ ' + (`${this.packageInfo.name} ${name} --help`);
     }).join('\n');
 
-    console.log(cmdTips);
+    cmdTips && console.log(cmdTips);
   }
 
   /**
