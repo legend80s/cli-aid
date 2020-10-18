@@ -13,7 +13,7 @@ exports.CLI = class CLI {
    */
   static defaultSchema = [
     ['help', 'h', 'docs', '文档', { to: CLI.toBoolean, defaultVal: false, help: 'Show this help information.' }],
-    ['version', 'v', { to: CLI.toBoolean, defaultVal: false, help: 'Show the version information' }],
+    ['version', 'v', { to: CLI.toBoolean, defaultVal: false, help: 'Show the version information.' }],
   ]
 
   /**
@@ -62,6 +62,7 @@ exports.CLI = class CLI {
   setVersion({ name, version }) {
     const pkgVersion = name ? `${name}/${version || ''} ` : '';
 
+    this.pkgVersionTips = pkgVersion;
     this.versionTips = `${pkgVersion}${process.platform}-${process.arch} node-${process.version}`
 
     return this;
@@ -140,8 +141,15 @@ exports.CLI = class CLI {
   /**
    * @private
    */
+  showPkgVersion() {
+    this.pkgVersionTips && console.log(this.pkgVersionTips)
+  }
+
+  /**
+   * @private
+   */
   showHelp() {
-    this.showVersion();
+    this.showPkgVersion();
 
     if (this.usageTips) {
       console.log(`\n${BOLD}USAGE${EOS}`);
@@ -156,7 +164,7 @@ exports.CLI = class CLI {
       const { help } = last(option);
 
       console.log(
-        ` ${GREEN}--${key}${alias.length ? ' [' + alias.join('|') + ']:' : ':'}${EOS}`,
+        ` ${GREEN}--${key}${alias.length ? ', -' + alias.join(', -') + `${EOS}:` : `${EOS}:`}`,
         help,
       );
     }
