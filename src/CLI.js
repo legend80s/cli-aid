@@ -50,7 +50,7 @@ exports.CLI = class CLI {
    * @returns {CLI}
    */
   setUsageTips({ name }) {
-    this.usageTips = name ? `$ ${name}` : '';
+    this.usageTips = name ? `$ ${name} [OPTIONS]` : '';
 
     return this;
   }
@@ -60,8 +60,9 @@ exports.CLI = class CLI {
    * @returns {CLI}
    */
   setVersion({ name, version }) {
-    this.versionTips = (name ? `${name}/${version || ''} ` : '') +
-      `${process.platform}-${process.arch} node-${process.version}`
+    const pkgVersion = name ? `${name}/${version || ''} ` : '';
+
+    this.versionTips = `${pkgVersion}${process.platform}-${process.arch} node-${process.version}`
 
     return this;
   }
@@ -140,6 +141,8 @@ exports.CLI = class CLI {
    * @private
    */
   showHelp() {
+    this.showVersion();
+
     if (this.usageTips) {
       console.log(`\n${BOLD}USAGE${EOS}`);
       console.log(` ${this.usageTips}`);
@@ -153,8 +156,7 @@ exports.CLI = class CLI {
       const { help } = last(option);
 
       console.log(
-        ` -`,
-        `${GREEN}${key}${alias.length ? ' [' + alias.join('|') + ']:' : ':'}${EOS}`,
+        ` ${GREEN}--${key}${alias.length ? ' [' + alias.join('|') + ']:' : ':'}${EOS}`,
         help,
       );
     }
