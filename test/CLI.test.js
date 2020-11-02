@@ -19,9 +19,9 @@ describe('CLI', () => {
       .option('key', { help: 'The Tinify key. Accessible at https://tinypng.com/developers.' })
       .option('src', { help: 'Image url or local image path to compress.' })
       .option('output', 'o', { help: 'The compressed image file path.' })
-      .option('max-count', 'm', { defaultVal: 15, help: 'The max compressing turns. Default 15.' })
-      .option('verbose', { defaultVal: false, help: 'Show more information about each compressing turn.' })
-      .option('no-base64', { defaultVal: false, help: 'Not output the base64 of the compressed image. base64 encoded by default.' })
+      .option('max-count', 'm', { default: 15, help: 'The max compressing turns. Default 15.' })
+      .option('verbose', { default: false, help: 'Show more information about each compressing turn.' })
+      .option('no-base64', { default: false, help: 'Not output the base64 of the compressed image. base64 encoded by default.' })
 
       .option('debug', { help: 'Show the parsed CLI params.' })
 
@@ -51,7 +51,7 @@ describe('CLI', () => {
 
   test('should parse boolean val as expected', () => {
     const actual = new CLI({ name: 'tinify-client', version: '2.0.0' })
-      .option('in-place', 'i', { defaultVal: false, help: 'Overwrite the original image. Default false' })
+      .option('in-place', 'i', { default: false, help: 'Overwrite the original image. Default false' })
 
       .parse([
         'https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ',
@@ -91,7 +91,7 @@ describe('CLI', () => {
   });
   test('should parse "true" as boolean', () => {
     const actual = new CLI({ name: 'tinify-client', version: '2.0.0' })
-      .option('in-place', 'i', { defaultVal: false, help: 'Overwrite the original image. Default false' })
+      .option('in-place', 'i', { default: false, help: 'Overwrite the original image. Default false' })
 
       .parse([
         'https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ',
@@ -111,7 +111,7 @@ describe('CLI', () => {
   });
   test('should parse "false" as false', () => {
     const actual = new CLI({ name: 'tinify-client', version: '2.0.0' })
-      .option('in-place', 'i', { defaultVal: false, help: 'Overwrite the original image. Default false' })
+      .option('in-place', 'i', { default: false, help: 'Overwrite the original image. Default false' })
 
       .parse([
         'https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ',
@@ -131,7 +131,7 @@ describe('CLI', () => {
   });
   test('should parse values not "true" as false', () => {
     const actual = new CLI({ name: 'tinify-client', version: '2.0.0' })
-      .option('in-place', 'i', { defaultVal: false, help: 'Overwrite the original image. Default false' })
+      .option('in-place', 'i', { default: false, help: 'Overwrite the original image. Default false' })
 
       .parse([
         'https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ',
@@ -155,9 +155,9 @@ describe('CLI', () => {
       ['key', { help: 'The Tinify key. Accessible at https://tinypng.com/developers.' }],
       ['src', { help: 'Image url or local image path to compress.' }],
       ['output', 'o', { help: 'The compressed image file path.' }],
-      ['max-count', 'm', { defaultVal: 15, help: 'The max compressing turns. Default 15.' }],
-      ['verbose', { defaultVal: false, help: 'Show more information about each compressing turn.' }],
-      ['no-base64', { defaultVal: false, help: 'Not output the base64 of the compressed image. base64 encoded by default.' }],
+      ['max-count', 'm', { default: 15, help: 'The max compressing turns. Default 15.' }],
+      ['verbose', { default: false, help: 'Show more information about each compressing turn.' }],
+      ['no-base64', { default: false, help: 'Not output the base64 of the compressed image. base64 encoded by default.' }],
       ['debug', { help: 'Show the parsed CLI params.' }],
     ];
 

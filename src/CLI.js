@@ -10,18 +10,18 @@ exports.CLI = class CLI {
   static defaultTransformer = String
 
   /**
-   * @type {Array<[...string[], { defaultVal: any; help: string; }]>}
+   * @type {Array<[...string[], { default: any; help: string; }]>}
    */
   static defaultSchema = [
-    ['help', 'h', 'docs', '文档', { defaultVal: false, help: 'Show this help information.' }],
-    ['version', 'v', { defaultVal: false, help: 'Show the version information.' }],
+    ['help', 'h', 'docs', '文档', { default: false, help: 'Show this help information.' }],
+    ['version', 'v', { default: false, help: 'Show the version information.' }],
   ]
 
   /**
-   * @param {{ name: string; version: string; schema: [...string[], { defaultVal: any; }]; }} options
+   * @param {{ name: string; version: string; schema: [...string[], { default: any; }]; }} options
    */
   constructor({ name, version, schema = [] } = {}) {
-    /** @type {Array<[...string[], { defaultVal: any; help: string; }]>} */
+    /** @type {Array<[...string[], { default: any; help: string; }]>} */
     this.schema = [...CLI.defaultSchema, ...schema];
 
     /** @type {Map<string, string | number | boolean>} */
@@ -91,7 +91,7 @@ exports.CLI = class CLI {
   }
 
   /**
-   * @param {[...string[], { defaultVal: any; }]} schemaEntry
+   * @param {[...string[], { default: any; }]} schemaEntry
    * @returns {CLI}
    */
   option(...schemaEntry) {
@@ -157,7 +157,7 @@ exports.CLI = class CLI {
     return this.schema.reduce((acc, option) => {
       const [_, val] = parsedEntries.find(([ key ]) => option.includes(key)) || [];
 
-      const { defaultVal } = last(option);
+      const { default: defaultVal } = last(option);
       const [ normalizedKey ] = option;
 
       acc.push([
