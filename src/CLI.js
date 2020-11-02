@@ -4,7 +4,7 @@ const { minimist } = require('./utils/minimist')
 
 exports.CLI = class CLI {
   static toString = String
-  static toBoolean = target => target === 'true' || target === ''
+  static toBoolean = target => target === true || target === 'true' || target === ''
   static toNumber = Number
 
   static defaultTransformer = String
@@ -160,7 +160,13 @@ exports.CLI = class CLI {
       const { defaultVal } = last(option);
       const [ normalizedKey ] = option;
 
-      acc.push([ normalizedKey, typeof val === 'undefined' ? defaultVal : val ]);
+      acc.push([
+        normalizedKey,
+
+        typeof val === 'undefined' ?
+          defaultVal :
+          ( typeof defaultVal === 'boolean' ? CLI.toBoolean(val) : val ),
+      ]);
 
       return acc;
     }, []);
