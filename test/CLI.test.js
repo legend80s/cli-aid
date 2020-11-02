@@ -49,6 +49,107 @@ describe('CLI', () => {
     expect(actual).toEqual(expected)
   });
 
+  test('should parse boolean val as expected', () => {
+    const actual = new CLI({ name: 'tinify-client', version: '2.0.0' })
+      .option('in-place', 'i', { defaultVal: false, help: 'Overwrite the original image. Default false' })
+
+      .parse([
+        'https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ',
+        '--in-place=true'
+      ]);
+
+    const expected = new Map([
+      ['in-place', true],
+
+      ['help', false],
+      ['version', false],
+
+      ['rest', ['https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ']],
+    ]);
+
+    expect(actual).toEqual(expected)
+  });
+  test('should parse val as string by default', () => {
+    const actual = new CLI({ name: 'tinify-client', version: '2.0.0' })
+      .option('in-place', 'i', { help: 'Overwrite the original image. Default false' })
+
+      .parse([
+        'https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ',
+        '--in-place=true'
+      ]);
+
+    const expected = new Map([
+      ['in-place', 'true'],
+
+      ['help', false],
+      ['version', false],
+
+      ['rest', ['https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ']],
+    ]);
+
+    expect(actual).toEqual(expected)
+  });
+  test('should parse "true" as boolean', () => {
+    const actual = new CLI({ name: 'tinify-client', version: '2.0.0' })
+      .option('in-place', 'i', { defaultVal: false, help: 'Overwrite the original image. Default false' })
+
+      .parse([
+        'https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ',
+        '--in-place=true'
+      ]);
+
+    const expected = new Map([
+      ['in-place', true],
+
+      ['help', false],
+      ['version', false],
+
+      ['rest', ['https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ']],
+    ]);
+
+    expect(actual).toEqual(expected)
+  });
+  test('should parse "false" as false', () => {
+    const actual = new CLI({ name: 'tinify-client', version: '2.0.0' })
+      .option('in-place', 'i', { defaultVal: false, help: 'Overwrite the original image. Default false' })
+
+      .parse([
+        'https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ',
+        '--in-place=false'
+      ]);
+
+    const expected = new Map([
+      ['in-place', false],
+
+      ['help', false],
+      ['version', false],
+
+      ['rest', ['https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ']],
+    ]);
+
+    expect(actual).toEqual(expected)
+  });
+  test('should parse values not "true" as false', () => {
+    const actual = new CLI({ name: 'tinify-client', version: '2.0.0' })
+      .option('in-place', 'i', { defaultVal: false, help: 'Overwrite the original image. Default false' })
+
+      .parse([
+        'https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ',
+        '--in-place=hello'
+      ]);
+
+    const expected = new Map([
+      ['in-place', false],
+
+      ['help', false],
+      ['version', false],
+
+      ['rest', ['https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ']],
+    ]);
+
+    expect(actual).toEqual(expected)
+  });
+
   test('should parse as expected when fill schema directly in constructor', () => {
     const schema = [
       ['key', { help: 'The Tinify key. Accessible at https://tinypng.com/developers.' }],
