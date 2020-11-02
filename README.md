@@ -11,7 +11,7 @@
     <img src="https://packagephobia.now.sh/badge?p=cli-aid" alt="Install Size">
   </a>
   <a href="https://github.com/legend80s/cli-aid/blob/main/src/CLI.test.js">
-    <img src="https://badgen.net/badge/passed/jest/green" alt="jest" />
+    <img src="https://badgen.net/badge/pass/jest/green" alt="jest" />
   </a>
 </p>
 
