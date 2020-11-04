@@ -1,15 +1,17 @@
 const { CLI } = require('../src/CLI');
 
+const defaults = {
+  help: false,
+  version: false,
+  _: [],
+}
+
 describe('CLI', () => {
   test('should parse as expected on minimal settings', () => {
     const actual = new CLI()
       .parse();
 
-    const expected = new Map([
-      ['help', false],
-      ['version', false],
-      ['rest', []],
-    ]);
+    const expected = defaults;
 
     expect(actual).toEqual(expected)
   });
@@ -31,7 +33,7 @@ describe('CLI', () => {
         '--debug',
       ]);
 
-    const expected = new Map([
+    const expected = mapToObject(new Map([
       ['key', undefined],
       ['src', undefined],
       ['output', './alipay-logo-2.png'],
@@ -43,8 +45,8 @@ describe('CLI', () => {
       ['help', false],
       ['version', false],
 
-      ['rest', ['https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ']],
-    ]);
+      ['_', ['https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ']],
+    ]));
 
     expect(actual).toEqual(expected)
   });
@@ -58,14 +60,14 @@ describe('CLI', () => {
         '--in-place=true'
       ]);
 
-    const expected = new Map([
+    const expected = mapToObject(new Map([
       ['in-place', true],
 
       ['help', false],
       ['version', false],
 
-      ['rest', ['https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ']],
-    ]);
+      ['_', ['https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ']],
+    ]));
 
     expect(actual).toEqual(expected)
   });
@@ -78,14 +80,14 @@ describe('CLI', () => {
         '--in-place=true'
       ]);
 
-    const expected = new Map([
+    const expected = mapToObject(new Map([
       ['in-place', 'true'],
 
       ['help', false],
       ['version', false],
 
-      ['rest', ['https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ']],
-    ]);
+      ['_', ['https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ']],
+    ]));
 
     expect(actual).toEqual(expected)
   });
@@ -98,14 +100,14 @@ describe('CLI', () => {
         '--in-place=true'
       ]);
 
-    const expected = new Map([
+    const expected = mapToObject(new Map([
       ['in-place', true],
 
       ['help', false],
       ['version', false],
 
-      ['rest', ['https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ']],
-    ]);
+      ['_', ['https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ']],
+    ]));
 
     expect(actual).toEqual(expected)
   });
@@ -118,14 +120,14 @@ describe('CLI', () => {
         '--in-place=false'
       ]);
 
-    const expected = new Map([
+    const expected = mapToObject(new Map([
       ['in-place', false],
 
       ['help', false],
       ['version', false],
 
-      ['rest', ['https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ']],
-    ]);
+      ['_', ['https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ']],
+    ]));
 
     expect(actual).toEqual(expected)
   });
@@ -138,14 +140,14 @@ describe('CLI', () => {
         '--in-place=hello'
       ]);
 
-    const expected = new Map([
+    const expected = mapToObject(new Map([
       ['in-place', false],
 
       ['help', false],
       ['version', false],
 
-      ['rest', ['https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ']],
-    ]);
+      ['_', ['https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ']],
+    ]));
 
     expect(actual).toEqual(expected)
   });
@@ -168,7 +170,7 @@ describe('CLI', () => {
         '--debug',
       ]);
 
-    const expected = new Map([
+    const expected = mapToObject(new Map([
       ['key', undefined],
       ['src', undefined],
       ['output', './alipay-logo-2.png'],
@@ -180,8 +182,8 @@ describe('CLI', () => {
       ['help', false],
       ['version', false],
 
-      ['rest', ['https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ']],
-    ]);
+      ['_', ['https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ']],
+    ]));
 
     expect(actual).toEqual(expected)
   });
@@ -190,11 +192,7 @@ describe('CLI', () => {
     const cli = new CLI({ name: 'cli-aid', version: '2.0.0' })
     const actual = cli.parse();
 
-    const expected = new Map([
-      ['help', false],
-      ['version', false],
-      ['rest', []],
-    ]);
+    const expected = defaults;
 
     expect(actual).toEqual(expected)
     expect(cli.versionTips).toEqual(`cli-aid/2.0.0 ${process.platform}-${process.arch} node-${process.version}`)
@@ -206,11 +204,7 @@ describe('CLI', () => {
 
     const actual = cli.parse();
 
-    const expected = new Map([
-      ['help', false],
-      ['version', false],
-      ['rest', []],
-    ]);
+    const expected = defaults;
 
     expect(actual).toEqual(expected)
     expect(cli.versionTips).toEqual(`cli-aid/2.0.0 ${process.platform}-${process.arch} node-${process.version}`)
@@ -220,11 +214,7 @@ describe('CLI', () => {
     const cli = new CLI();
     const actual = cli.parse();
 
-    const expected = new Map([
-      ['help', false],
-      ['version', false],
-      ['rest', []],
-    ]);
+    const expected = defaults;
 
     expect(actual).toEqual(expected)
     expect(cli.versionTips).toEqual(`${process.platform}-${process.arch} node-${process.version}`)
@@ -245,11 +235,11 @@ describe('CLI', () => {
 
     const actual = cli.parse([ 'base64', 'https://example.com/example.png' ]);
 
-    const expected = new Map([
+    const expected = mapToObject(new Map([
       ['help', false],
       ['version', false],
-      ['rest', ['base64', 'https://example.com/example.png']],
-    ]);
+      ['_', ['base64', 'https://example.com/example.png']],
+    ]));
 
     expect(actual).toEqual(expected);
     expect(actualOptions).toEqual(expected);
@@ -275,16 +265,54 @@ describe('CLI', () => {
 
     // console.log('info:', actual);
 
-    const expected = new Map([
+    const expected = mapToObject(new Map([
       ['help', false],
       ['version', false],
-      ['rest', [
+      ['_', [
         'base64xyz',
         'https://s.gravatar.com/avatar/438e8984d73c7da54916acb86fb5fb7c?size=100&default=retro',
       ]],
-    ]);
+    ]));
 
     expect(actual).toEqual(expected);
     expect(actualOptions).toEqual(null);
   });
+
+  // ts config for minimist
+  test('the value with same key should be joined into array', () => {
+    const actual = new CLI({ name: 'tinify-client', version: '2.0.0' })
+      .option('in-place', 'i', { default: false, help: 'Overwrite the original image. Default false' })
+      .option('x', { help: 'Overwrite the original image. Default false' })
+
+      .parse([
+        'https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ',
+        '--in-place=hello',
+        '-x=1',
+        '-x=2',
+      ], { duplicateArgumentsArray: true });
+
+    // console.log('actual:', actual);
+
+    const expected = {
+      'in-place': false,
+      help: false,
+      version: false,
+      _: ['https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ'],
+
+      x: [1, 2],
+    };
+
+    expect(actual).toEqual(expected)
+  });
 });
+
+/**
+ *
+ * @param {Map<string, any>} map
+ */
+function mapToObject(map) {
+  return [...map.entries()].reduce((acc, [k, v]) => ({
+    ...acc,
+    [k]: v,
+  }), {});
+}

@@ -24,8 +24,10 @@ exports.CLI = class CLI {
     /** @type {Array<[...string[], { default: any; help: string; }]>} */
     this.schema = [...CLI.defaultSchema, ...schema];
 
-    /** @type {Map<string, string | number | boolean>} */
-    this.parsed = new Map();
+    /**
+     * @type {{ _: string[]; help: boolean; version: boolean; }}
+     */
+    this.parsed = Object.create(null);
 
     /**
      * @type {Array<{ name: string; helpTips: string; execute: (options: IParsedOptions) => any }>}
@@ -91,7 +93,7 @@ exports.CLI = class CLI {
   }
 
   /**
-   * @param {[...string[], { default: any; }]} schemaEntry
+   * @param {[...string[], { default?: unknown; help?: string; }]} schemaEntry
    * @returns {CLI}
    */
   option(...schemaEntry) {
@@ -104,7 +106,7 @@ exports.CLI = class CLI {
    * Add command.
    * @param cmd
    * @param {{ help: string; usage: string; }} options
-   * @param {(options: Map<string, string | number | boolean | string[]>) => void} execute
+   * @param {(options: Record<string, any>) => void} execute
    */
   command(cmd = '', options, execute = () => {}) {
     if (!cmd || !isString(cmd)) {
@@ -136,13 +138,19 @@ exports.CLI = class CLI {
 
   /**
    * @param {string[]} argv
-   * @returns {Map<string, string | number | boolean>}
+   * @param {{ duplicateArgumentsArray: boolean; }} config Should arguments be coerced into an array when duplicated:
+   * @returns {Record<string, any>}
    */
-  parse(argv = []) {
-    const parsed = minimist(argv);
+  parse(argv = [], config) {
+    const parsed = minimist(argv, config);
     const argEntries = this.parseAgainstSchema(parsed);
 
-    this.parsed = new Map([...argEntries, ['rest', parsed.rest]]);
+    // console.log('argEntries:', argEntries);
+
+    this.parsed = {
+      ...argEntries,
+      _: parsed._,
+    };
 
     this.after(this.parsed);
 
@@ -151,45 +159,44 @@ exports.CLI = class CLI {
 
   /**
    * @private
-   * @param {Array<[key: string, val: string]>} parsedEntries
+   * @param {Record<string, string | boolean | number | any[]>} parsedEntries
    */
   parseAgainstSchema(parsedEntries) {
     return this.schema.reduce((acc, option) => {
-      const [_, val] = parsedEntries.find(([ key ]) => option.includes(key)) || [];
+      const key = Object.keys(parsedEntries).find(key => option.includes(key));
+      const val = parsedEntries[key];
 
       const { default: defaultVal } = last(option);
       const [ normalizedKey ] = option;
 
-      acc.push([
-        normalizedKey,
+      return {
+        ...acc,
 
-        typeof val === 'undefined' ?
+        [normalizedKey]: typeof val === 'undefined' ?
           defaultVal :
           ( typeof defaultVal === 'boolean' ? CLI.toBoolean(val) : val ),
-      ]);
-
-      return acc;
-    }, []);
+      };
+    }, Object.create(null));
   }
 
   /**
    * @private
-   * @param {Map<string, any>} parsed
+   * @param {{ help: boolean; version: boolean; }} parsed
    */
   after(parsed) {
-    if (parsed.get('help')) {
+    if (parsed.help) {
       this.showHelp();
 
       process.exit(0);
     }
 
-    if (parsed.get('version')) {
+    if (parsed.version) {
       this.showVersion();
 
       process.exit(0);
     }
 
-    const cmd = this.commands.find(cmd => this.isCmdPassed(cmd))
+    const cmd = this.commands.find(cmd => this.hasCmd(cmd))
 
     cmd && cmd.execute(parsed);
 
@@ -197,10 +204,11 @@ exports.CLI = class CLI {
   }
 
   /**
+   * if have cmd in argv
    * @private
    */
-  isCmdPassed(cmd) {
-    return this.parsed.get('rest').includes(cmd.name);
+  hasCmd(cmd) {
+    return this.parsed._.includes(cmd.name);
   }
   /**
    * @private
@@ -213,11 +221,8 @@ exports.CLI = class CLI {
    * @private
    */
   showHelp() {
-    // console.log('this.commands:', this.commands);
-    // console.log('this.parsed.get(rest):', this.parsed.get('rest'));
-
     const cmd = this.commands.find(cmd =>
-      this.isCmdPassed(cmd)
+      this.hasCmd(cmd)
     );
 
     // console.log('cmd:', cmd);
