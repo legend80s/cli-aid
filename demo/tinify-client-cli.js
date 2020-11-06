@@ -2,7 +2,14 @@ const { CLI } = require('../src');
 
 // console.log('process.argv.slice(2):', process.argv.slice(2));
 
+const pkg = {
+  name: 'tinify-client',
+  version: '3',
+  description: 'A CLI to compress your images not only intelligently but also to the EXTREME!',
+};
+
 new CLI({ name: 'tinify-client-cli', version: '2.0.0' })
+  .package(pkg)
   .option('max-count', 'm', { default: 15, help: 'The max compressing turns. Default 15.' })
   .option('in-place', 'i', { default: false, help: 'Overwrite the original image. Default false.' })
   .command('base64', {
