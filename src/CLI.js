@@ -1,4 +1,4 @@
-const { GREEN, EOS, BOLD } = require('./constants/colors')
+const { GREEN, EOS, BOLD, CYAN_BRIGHT } = require('./constants/colors')
 const { last, isString, isFunction, isRemoteFile } = require('./utils/lite-lodash')
 const { minimist } = require('./utils/minimist')
 
@@ -21,22 +21,40 @@ exports.CLI = class CLI {
    * @param {{ name: string; version: string; schema: [...string[], { default: any; }]; }} options
    */
   constructor({ name, version, schema = [] } = {}) {
-    /** @type {Array<[...string[], { default: any; help: string; }]>} */
+    /**
+     * @private
+     * @type {Array<[...string[], { default: any; help: string; }]>}
+     */
     this.schema = [...CLI.defaultSchema, ...schema];
 
     /**
+     * @private
      * @type {{ _: string[]; help: boolean; version: boolean; }}
      */
     this.parsed = Object.create(null);
 
     /**
+     * @private
      * @type {Array<{ name: string; helpTips: string; execute: (options: IParsedOptions) => any }>}
      */
     this.commands = [];
 
     const packageInfo = { name, version };
 
-    this.packageInfo = packageInfo;
+    /**
+     * @private
+     */
+    this.pkg = packageInfo;
+
+    /**
+     * @private
+     */
+    this.pkgInfo = '';
+
+    /**
+     * @private
+     */
+    this.versionTips = '';
 
     this
       .setUsageTips(packageInfo)
@@ -45,36 +63,43 @@ exports.CLI = class CLI {
 
   /**
    * set package.json
+   *
    * @public
+   *
    * @param {{ name: string; version: string }} packageInfo
    * @returns {CLI}
    */
   package(packageInfo) {
-    this.packageInfo = packageInfo;
-    this.setVersion(packageInfo);
+    const pkg = { ...this.pkg, ...packageInfo }
+
+    this.pkg = pkg;
+    this.setVersion(pkg);
 
     return this;
   }
 
   /**
    * @private
+   *
    * @param {{ name: string }}
    * @returns {CLI}
    */
   setUsageTips({ name }) {
-    this.usageTips = name ? `$ ${name} [OPTIONS]` : '';
+    this.usageTips = name ? ` ${name} [OPTIONS]` : '';
 
     return this;
   }
 
   /**
-   * @param {{ name: string; version: string; }}
+   * @private
+   *
+   * @param {{ name: string; version: string; description: string; }}
    * @returns {CLI}
    */
-  setVersion({ name, version }) {
+  setVersion({ name, version, description }) {
     const pkgVersion = name ? `${name}/${version || ''} ` : '';
 
-    this.pkgVersionTips = pkgVersion;
+    this.pkgInfo = pkgVersion + (description ? '\n\n' + `${CYAN_BRIGHT}${description}${EOS}` : '');
     this.versionTips = `${pkgVersion}${process.platform}-${process.arch} node-${process.version}`
 
     return this;
@@ -82,7 +107,9 @@ exports.CLI = class CLI {
 
   /**
    * set usage tips
+   *
    * @public
+   *
    * @param {string} tips
    * @returns {CLI}
    */
@@ -93,6 +120,8 @@ exports.CLI = class CLI {
   }
 
   /**
+   * @public
+   *
    * @param {[...string[], { default?: unknown; help?: string; }]} schemaEntry
    * @returns {CLI}
    */
@@ -104,6 +133,9 @@ exports.CLI = class CLI {
 
   /**
    * Add command.
+   *
+   * @public
+   *
    * @param cmd
    * @param {{ help: string; usage: string; }} options
    * @param {(options: Record<string, any>) => void} execute
@@ -137,6 +169,8 @@ exports.CLI = class CLI {
   }
 
   /**
+   * @public
+   *
    * @param {string[]} argv
    * @param {{ duplicateArgumentsArray: boolean; }} config Should arguments be coerced into an array when duplicated:
    * @returns {Record<string, any>}
@@ -159,6 +193,7 @@ exports.CLI = class CLI {
 
   /**
    * @private
+   *
    * @param {Record<string, string | boolean | number | any[]>} parsedEntries
    */
   parseAgainstSchema(parsedEntries) {
@@ -181,6 +216,7 @@ exports.CLI = class CLI {
 
   /**
    * @private
+   *
    * @param {{ help: boolean; version: boolean; }} parsed
    */
   after(parsed) {
@@ -210,11 +246,12 @@ exports.CLI = class CLI {
   hasCmd(cmd) {
     return this.parsed._.includes(cmd.name);
   }
+
   /**
    * @private
    */
-  showPkgVersion() {
-    this.pkgVersionTips && console.log(this.pkgVersionTips)
+  showPkgInfo() {
+    this.pkgInfo && console.log(this.pkgInfo)
   }
 
   /**
@@ -233,17 +270,17 @@ exports.CLI = class CLI {
       return;
     }
 
-    this.showPkgVersion();
+    this.showPkgInfo();
 
     if (this.commands.length || this.usageTips) {
-      console.log(`\n${BOLD}USAGE${EOS}`);
+      console.log(`\n${BOLD}Usage${EOS}`);
       console.log(` ${this.usageTips}`);
 
       this.showAllCommandUsageTips();
     }
 
     console.log('');
-    console.log(`${BOLD}OPTIONS${EOS}`);
+    console.log(`${BOLD}Options${EOS}`);
 
     for (const option of this.schema) {
       const [key, ...alias] = option.filter(isString);
@@ -265,8 +302,8 @@ exports.CLI = class CLI {
     console.log(cmd.help);
     console.log();
 
-    console.log(`${BOLD}USAGE${EOS}`);
-    console.log(' $', cmd.usage);
+    console.log(`${BOLD}Usage${EOS}`);
+    console.log(' ', cmd.usage);
 
     console.log();
   }
@@ -276,7 +313,7 @@ exports.CLI = class CLI {
    */
   showAllCommandUsageTips() {
     const cmdTips = this.commands.map(({ name }) => {
-      return ' $ ' + (`${this.packageInfo.name} ${name} --help`);
+      return '  ' + (`${this.pkg.name} ${name} --help`);
     }).join('\n');
 
     cmdTips && console.log(cmdTips);
