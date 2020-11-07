@@ -13,7 +13,7 @@ exports.CLI = class CLI {
    * @type {Array<[...string[], { default: any; help: string; }]>}
    */
   static defaultSchema = [
-    ['help', 'h', 'docs', '文档', { default: false, help: 'Show this help information.' }],
+    ['help', 'h', 'docs', '帮助', { default: false, help: 'Show this help information.' }],
     ['version', 'v', { default: false, help: 'Show the version information.' }],
   ]
 
@@ -56,6 +56,11 @@ exports.CLI = class CLI {
      */
     this.versionTips = '';
 
+    /**
+     * @private
+     */
+    this.usageTips = '';
+
     this
       .setUsageTips(packageInfo)
       .setVersion(packageInfo);
@@ -74,6 +79,7 @@ exports.CLI = class CLI {
 
     this.pkg = pkg;
     this.setVersion(pkg);
+    this.setUsageTips(pkg)
 
     return this;
   }
@@ -85,7 +91,7 @@ exports.CLI = class CLI {
    * @returns {CLI}
    */
   setUsageTips({ name }) {
-    this.usageTips = name ? ` ${name} [OPTIONS]` : '';
+    this.usageTips = name ? `  ${name} [OPTIONS]` : '';
 
     return this;
   }
@@ -274,7 +280,7 @@ exports.CLI = class CLI {
 
     if (this.commands.length || this.usageTips) {
       console.log(`\n${BOLD}Usage${EOS}`);
-      console.log(` ${this.usageTips}`);
+      console.log(`${this.usageTips}`);
 
       this.showAllCommandUsageTips();
     }
@@ -287,7 +293,7 @@ exports.CLI = class CLI {
       const { help } = last(option);
 
       console.log(
-        ` ${GREEN}--${key}${alias.length ? ', -' + alias.join(', -') + `${EOS}:` : `${EOS}:`}`,
+        `  ${GREEN}--${key}${alias.length ? ', -' + alias.join(', -') + `${EOS}:` : `${EOS}:`}`,
         help,
       );
     }
@@ -313,7 +319,7 @@ exports.CLI = class CLI {
    */
   showAllCommandUsageTips() {
     const cmdTips = this.commands.map(({ name }) => {
-      return '  ' + (`${this.pkg.name} ${name} --help`);
+      return '  ' + (`${this.pkg.name} ${name} [OPTIONS]`);
     }).join('\n');
 
     cmdTips && console.log(cmdTips);
