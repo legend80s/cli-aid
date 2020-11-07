@@ -33,15 +33,19 @@ new CLI({ name: 'tinify-client-cli', version: '2.0.0' })
 `node demo/tinify-client-cli.js --h`
 
 ```text
-tinify-client-cli/2.0.0
+tinify-client/4.3.0
 
-USAGE
- $ tinify-client-cli [OPTIONS]
+A CLI to compress your images not only intelligently but also to the EXTREME!
 
-OPTIONS
- --help, -h, -docs, -文档: Show this help information.
- --version, -v: Show the version information.
- --max-count, -m: The max compressing turns. Default 15.
+Usage
+  tinify-client [OPTIONS]
+  tinify-client base64 [OPTIONS]
+
+Options
+  --help, -h, -docs, -帮助: Show this help information.
+  --version, -v: Show the version information.
+  --dry-run: Does everything compress would do except actually compressing. Reports the details of what would have been compressed
+  --max-count, -m, -c: The max compressing turns. Default 15.
 ```
 
 `node demo/tinify-client-cli.js --v`
@@ -51,3 +55,8 @@ tinify-client-cli/2.0.0 darwin-x64 node-v12.8.1
 ```
 
 READ more options in [CLI.test.js](https://github.com/legend80s/cli-aid/blob/main/test/CLI.test.js) and command in [demo/tinify-client-cli.js](https://github.com/legend80s/cli-aid/blob/main/demo/tinify-client-cli.js).
+
+## TODO
+
+- [ ] cmd options
+- [ ] cmd help msg
