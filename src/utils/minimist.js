@@ -8,7 +8,7 @@ const { isRemoteFile, isString } = require('./lite-lodash');
  * https://www.npmjs.com/package/yargs-parser#duplicate-arguments-array
  * @returns {Record<string, any>}
  */
-exports.minimist = (argv = [], { duplicateArgumentsArray = false } = {}) => {
+exports.minimist1 = (argv = [], { duplicateArgumentsArray = false } = {}) => {
   const parsed = argv
     // collect the args prefixed with '-' or '--' or '=' as cmd
     .filter(isCmdArg)
@@ -95,4 +95,85 @@ function isUndefined(obj) {
 
 function arraify(obj) {
   return Array.isArray(obj) ? obj : [obj];
+}
+
+exports.minimist = function parse(argv = [], { duplicateArgumentsArray = false } = {}) {
+  const result = Object.create(null);
+
+  result._ = [];
+
+  for (let i = 0, step = 1; i < argv.length; i += step) {
+    const entry = String(argv[i]);
+
+    if (!entry.startsWith('-')) { result._.push(entry); step = 1; continue; }
+
+    if (entry.includes('=')) {
+      const idx = entry.indexOf('=');
+      const key = normalizeKey(entry.slice(0, idx));
+
+      const val = entry.slice(idx + 1)
+
+      insert(result, key, val, { shouldGroupDuplicateArgs: duplicateArgumentsArray })
+
+      step = 1;
+      continue;
+    }
+
+    const next = String(argv[i + 1]);
+    const key = normalizeKey(entry);
+    const atEnd = i + 1 === argv.length;
+
+    if (atEnd || next.startsWith('-')) {
+      insert(result, key, true, { shouldGroupDuplicateArgs: duplicateArgumentsArray });
+
+      step = 1;
+      continue;
+    }
+
+    insert(result, key, next, { shouldGroupDuplicateArgs: duplicateArgumentsArray });
+
+    step = 2;
+  }
+
+  return result;
+}
+
+function removeAllBeginningHyphens(key) {
+  return key.replace(/^-+/, '');
+}
+
+function normalizeKey(key) {
+  return key.replace(/^-{1,2}/, '');
+}
+
+function getValues(arr, key, newVal) {
+  const originalVal = arr[key];
+
+  return Array.isArray(originalVal) ? [...originalVal, newVal] : [originalVal, newVal]
+}
+
+function insert(result, key, newVal, { shouldGroupDuplicateArgs = false }) {
+  const originalVal = result[key];
+  const coercedNewVal = toNumber(toBoolean(newVal));
+
+  // console.log({result, key, newVal, coercedNewVal});
+
+  if (shouldGroupDuplicateArgs && originalVal !== undefined) {
+    result[key] = getValues(result, key, coercedNewVal);
+  } else {
+    result[key] = coercedNewVal;
+  }
+
+  if (!key.startsWith('-')) {
+    return;
+  }
+
+  const keyWithoutBeginningHyphens = removeAllBeginningHyphens(key);
+  const originalValWithoutBeginningHyphens = result[keyWithoutBeginningHyphens];
+
+  if (shouldGroupDuplicateArgs && originalValWithoutBeginningHyphens !== undefined) {
+    result[keyWithoutBeginningHyphens] = getValues(result, keyWithoutBeginningHyphens, coercedNewVal);
+  } else {
+    result[keyWithoutBeginningHyphens] = coercedNewVal;
+  }
 }
