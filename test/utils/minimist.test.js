@@ -54,6 +54,34 @@ describe('minimist', () => {
     expect(actual).toEqual(expected);
   });
 
+  it('Should arguments after `--` be collected into positional args', () => {
+    const argv = 'hello -x 1 -x 2 world -- --for --bar=baz -a'.split(' ');
+
+    const expected = {
+      x: 2,
+      _: [
+        'hello',
+        'world',
+
+        '--for',
+        '--bar=baz',
+        '-a',
+      ],
+    };
+
+    const actual = minimist(argv);
+
+    // console.log('actual:', actual);
+
+    const { _: restActual, ...othersActual } = actual;
+    const { _: restExpected, ...othersExpected } = expected;
+
+    expect(othersActual).toEqual(othersExpected);
+    expect(restActual.sort()).toEqual(restExpected.sort());
+
+    expect(actual).toEqual(expected);
+  });
+
   it('Should arguments be coerced into an array when duplicated', () => {
     const argv = '-x=1 -x=2'.split(' ');
 
