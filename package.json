@@ -1,7 +1,7 @@
 {
   "name": "cli-aid",
   "version": "5.1.0",
-  "description": "Lightweight CLI-App maker with 0 dependencies 🚀.",
+  "description": "Lightweight CLI-App Factory with 0 Dependencies 🚀.",
   "main": "./src/index.js",
   "files": [
     "src/*"
