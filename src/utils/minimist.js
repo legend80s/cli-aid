@@ -35,7 +35,7 @@ exports.minimist1 = (argv = [], { duplicateArgumentsArray = false } = {}) => {
         ...acc,
 
         [key]: isDefined(acc[key]) && duplicateArgumentsArray ?
-          [...arraify(acc[key]), val] :
+          [...toArray(acc[key]), val] :
           val,
       };
     }, Object.create(null));
@@ -93,7 +93,7 @@ function isUndefined(obj) {
   return typeof obj === 'undefined';
 }
 
-function arraify(obj) {
+function toArray(obj) {
   return Array.isArray(obj) ? obj : [obj];
 }
 
@@ -104,6 +104,8 @@ exports.minimist = function parse(argv = [], { duplicateArgumentsArray = false }
 
   for (let i = 0, step = 1; i < argv.length; i += step) {
     const entry = String(argv[i]);
+
+    if (entry == '--') { result._.push(...argv.slice(i + 1)); break; }
 
     if (!entry.startsWith('-')) { result._.push(entry); step = 1; continue; }
 
@@ -149,7 +151,7 @@ function normalizeKey(key) {
 function getValues(arr, key, newVal) {
   const originalVal = arr[key];
 
-  return Array.isArray(originalVal) ? [...originalVal, newVal] : [originalVal, newVal]
+  return  [...toArray(originalVal), newVal]
 }
 
 function insert(result, key, newVal, { shouldGroupDuplicateArgs = false }) {
