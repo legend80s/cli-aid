@@ -1,6 +1,6 @@
 {
   "name": "cli-aid",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "description": "Lightweight CLI-App Factory with 0 Dependencies 🚀.",
   "main": "./src/index.js",
   "files": [
