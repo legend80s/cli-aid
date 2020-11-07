@@ -91,7 +91,7 @@ exports.CLI = class CLI {
    * @returns {CLI}
    */
   setUsageTips({ name }) {
-    this.usageTips = name ? `  ${name} [OPTIONS]` : '';
+    this.usageTips = name ? `${name} [OPTIONS]` : '';
 
     return this;
   }
@@ -280,7 +280,7 @@ exports.CLI = class CLI {
 
     if (this.commands.length || this.usageTips) {
       console.log(`\n${BOLD}Usage${EOS}`);
-      console.log(`${this.usageTips}`);
+      console.log(`  ${this.usageTips}`);
 
       this.showAllCommandUsageTips();
     }

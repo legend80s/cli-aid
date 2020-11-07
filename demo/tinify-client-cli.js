@@ -9,6 +9,7 @@ const pkg = {
 
 new CLI()
   .package(pkg)
+  // .usage('npx tinify-client IMG_URL_OR_LOCAL_IMG_PATH [OPTIONS]')
   .option('dry-run', { default: false, help: 'Does everything compress would do except actually compressing. Reports the details of what would have been compressed' })
   .option('max-count', 'm', 'c', { default: 15, help: 'The max compressing turns. Default 15.' })
   .command('base64', {
