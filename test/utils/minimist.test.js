@@ -8,7 +8,9 @@ describe('minimist', () => {
       x: 3,
       y: 4,
       n: 5,
-      abc: true,
+      a: true,
+      b: true,
+      c: true,
       beep: 'boop',
 
       _: [
@@ -30,13 +32,15 @@ describe('minimist', () => {
 
   it('Should parse as yargs-parser when use `space` as separator', () => {
     const input = ['-x=1', '-y', 2, '--foo=3', '----foo=4', '-uvw=31', '--bar', 4, 'p=5', '--q=-x', '-----k=-x', '-z', '--two', '--baz====1'];
-    const actual = minimist(input, { duplicateArgumentsArray: true });
+    const actual = minimist(input, { "duplicate-arguments-array": true });
     const expected = {
       x: 1,
       y: 2,
       foo: [3, 4],
       '--foo': 4,
-      uvw: 31,
+      u: true,
+      v: true,
+      w: 31,
       bar: 4,
       q: '-x',
 
@@ -82,6 +86,51 @@ describe('minimist', () => {
     expect(actual).toEqual(expected);
   });
 
+  it('Should word with one beginning hyphen parsed into "booleans"', () => {
+    const argv = '-hello --world -name=legend -age 80 -xy'.split(' ');
+
+    const expected = {
+      h: true,
+      l: [true, true],
+      o: true,
+
+      world: true,
+
+      n: true,
+      m: true,
+      a: [true, true],
+      e: [true, 'legend', 80],
+
+      g: true,
+
+      x: true,
+      y: true,
+
+      _: [],
+    };
+
+    const actual = minimist(argv, { 'duplicate-arguments-array': true });
+
+    expect(actual).toEqual(expected);
+  });
+
+  it('Should arguments with one beginning hyphen parsed into "a boolean" when `short-option-groups` disabled', () => {
+    const argv = '-hello --world -name=legend -age 80 -xy'.split(' ');
+
+    const expected = {
+      hello: true,
+      world: true,
+      name: 'legend',
+      age: 80,
+      xy: true,
+      _: [],
+    };
+
+    const actual = minimist(argv, { 'short-option-groups': false });
+
+    expect(actual).toEqual(expected);
+  });
+
   it('Should arguments be coerced into an array when duplicated', () => {
     const argv = '-x=1 -x=2'.split(' ');
 
@@ -90,14 +139,14 @@ describe('minimist', () => {
       _: [],
     };
 
-    const actual = minimist(argv, { duplicateArgumentsArray: true });
+    const actual = minimist(argv, { "duplicate-arguments-array": true });
 
     expect(actual).toEqual(expected);
   });
 
   it('Should group the duplicate key with redundant hyphens', () => {
     const input = ['--foo=3', '--foo=3', '---foo=4', '---foo=4', '----foo=5', '----foo=5', '-----foo=6'];
-    const actual = minimist(input, { duplicateArgumentsArray: true });
+    const actual = minimist(input, { "duplicate-arguments-array": true });
     const expected = {
       foo: [3, 3, 4, 4, 5, 5, 6],
       '-foo': [4, 4],
@@ -114,7 +163,7 @@ describe('minimist', () => {
 
   it('Should parse multiple beginning hyphens into two entry', () => {
     const input = ['-----k=-x'];
-    const actual = minimist(input, { duplicateArgumentsArray: true });
+    const actual = minimist(input, { "duplicate-arguments-array": true });
     const expected = {
       '---k': '-x',
       k: '-x',
@@ -129,7 +178,7 @@ describe('minimist', () => {
 
   it('Should parse the ending flag as boolean', () => {
     const input = ['--debug'];
-    const actual = minimist(input, { duplicateArgumentsArray: true });
+    const actual = minimist(input, { "duplicate-arguments-array": true });
     const expected = {
       debug: true,
 

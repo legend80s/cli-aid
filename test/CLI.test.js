@@ -289,7 +289,7 @@ describe('CLI', () => {
         '--in-place=hello',
         '-x=1',
         '-x=2',
-      ], { duplicateArgumentsArray: true });
+      ], { "duplicate-arguments-array": true });
 
     // console.log('actual:', actual);
 
