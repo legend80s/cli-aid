@@ -178,7 +178,6 @@ exports.CLI = class CLI {
    * @public
    *
    * @param {string[]} argv
-   * @param {{ 'duplicate-arguments-array': boolean; }} config Should arguments be coerced into an array when duplicated:
    * @returns {Record<string, any>}
    */
   parse(argv = [], config) {

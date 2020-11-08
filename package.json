@@ -1,7 +1,7 @@
 {
   "name": "cli-aid",
   "version": "6.0.1",
-  "description": "Lightweight CLI-App Factory with 0 Dependencies 🚀.",
+  "description": "Lightweight CLI-App Factory based on process-yargs-parser 🚀.",
   "main": "./src/index.js",
   "files": [
     "src/*"
@@ -26,5 +26,8 @@
     "@types/jest": "^26.0.14",
     "git-commit-msg-linter": "^3.0.0",
     "jest": "^26.5.3"
+  },
+  "dependencies": {
+    "process-yargs-parser": "^0.0.3"
   }
 }

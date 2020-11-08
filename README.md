@@ -1,5 +1,7 @@
 # cli-aid
 
+> Lightweight CLI-App Factory based on process-yargs-parser 🚀.
+
 <p>
   <a href="https://www.npmjs.com/package/cli-aid">
     <img src="https://img.shields.io/npm/v/cli-aid.svg" alt="npm version" />
@@ -14,8 +16,6 @@
     <img src="https://badgen.net/badge/passed/jest/green" alt="jest" />
   </a>
 </p>
-
-> Lightweight CLI-App maker with 0 dependencies 🚀.
 
 ## Use
 
