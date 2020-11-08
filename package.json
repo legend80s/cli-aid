@@ -1,6 +1,6 @@
 {
   "name": "cli-aid",
-  "version": "6.0.1",
+  "version": "6.1.0",
   "description": "Lightweight CLI-App Factory based on process-yargs-parser 🚀.",
   "main": "./src/index.js",
   "files": [
