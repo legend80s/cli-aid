@@ -22,30 +22,47 @@
 [github demo/tinify-client-cli.js](https://github.com/legend80s/cli-aid/blob/main/demo/tinify-client-cli.js).
 
 ```javascript
-// demo/tinify-client-cli.js
 const { CLI } = require('../src');
 
-new CLI({ name: 'tinify-client-cli', version: '2.0.0' })
-  .option('max-count', 'm', { default: 15, help: 'The max compressing turns. Default 15.' })
+const pkg = {
+  name: 'tinify-client',
+  version: '4.3.0',
+  description: 'A CLI to compress your images not only intelligently but also to the EXTREME!',
+};
+
+new CLI()
+  .package(pkg)
+  .option('dry-run', { default: false, help: 'Does everything compress would do except actually compressing. Reports the details of what would have been compressed.' })
+  .option('max-count', 'm', 'c', { default: 15, help: 'The max compressing turns. Default 15.' })
+  .command('base64', {
+    usage: 'npx tinify-client base64 IMG_URL_OR_LOCAL_IMG_PATH',
+    help: 'Output base64-encoded string of the input image.',
+  }, (options) => {
+    console.log('output base64 with options:', options);
+
+    process.exit(0);
+  })
   .parse(process.argv.slice(2));
+
 ```
 
 `node demo/tinify-client-cli.js --h`
 
-```text
+```sh
 tinify-client/4.3.0
 
 A CLI to compress your images not only intelligently but also to the EXTREME!
 
 Usage
   tinify-client [OPTIONS]
-  tinify-client base64 [OPTIONS]
+  npx tinify-client base64 IMG_URL_OR_LOCAL_IMG_PATH
 
 Options
-  --help, -h, -docs, -帮助: Show this help information.
-  --version, -v: Show the version information.
-  --dry-run: Does everything compress would do except actually compressing. Reports the details of what would have been compressed
-  --max-count, -m, -c: The max compressing turns. Default 15.
+  --help, -h, -docs, -帮助    Show this help information.
+  --version, -v               Show the version information.
+  --dry-run                   Does everything compress would do except actually compressing. Reports the details of what would have been compressed.
+  --max-count, -m, -c         The max compressing turns. Default 15.
+
 ```
 
 `node demo/tinify-client-cli.js --v`
