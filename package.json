@@ -7,7 +7,7 @@
     "src/*"
   ],
   "scripts": {
-    "prepublish": "npm test",
+    "preversion": "npm test",
     "test": "jest && npm run test:e2e",
     "test:e2e": "node demo/tinify-client-cli.js -v && node demo/tinify-client-cli.js -h"
   },
