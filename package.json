@@ -28,6 +28,7 @@
     "jest": "^26.5.3"
   },
   "dependencies": {
-    "process-yargs-parser": "^0.0.3"
+    "process-yargs-parser": "^0.0.3",
+    "string-width": "^4.2.0"
   }
 }
