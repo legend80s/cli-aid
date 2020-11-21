@@ -1,3 +1,5 @@
+const stringWidth = require('string-width');
+
 const { GREEN, EOS, BOLD, CYAN_BRIGHT } = require('./constants/colors')
 const { last, isString, isFunction } = require('./utils/lite-lodash')
 const { minimist } = require('./utils/minimist')
@@ -285,19 +287,60 @@ exports.CLI = class CLI {
     }
 
     console.log('');
+    this.printOptions();
+    console.log('');
+  }
+
+  /**
+   * @private
+   */
+  printOptions() {
     console.log(`${BOLD}Options${EOS}`);
+
+    /**
+     * @type {Array<{ mergedOption: string; help: string; offset: number }>}
+     */
+    let messages = [];
+    let maxOption = '';
+    let maxLength = 0;
 
     for (const option of this.schema) {
       const [key, ...alias] = option.filter(isString);
       const { help } = last(option);
 
-      console.log(
-        `  ${GREEN}--${key}${alias.length ? ', -' + alias.join(', -') + `${EOS}:` : `${EOS}:`}`,
-        help,
-      );
+      const mergedOption = `--${key}${alias.length ? ', -' + alias.join(', -') : ''}`;
+
+      const length = mergedOption.length;
+
+      if (length > maxLength) {
+        maxOption = mergedOption;
+
+        maxLength = length;
+      }
+
+      // console.log('mergedOption:', mergedOption, 'length', length, 'stringWidth', stringWidth(mergedOption));
+
+      messages.push({ mergedOption, help, offset: stringWidth(mergedOption) - length });
     }
 
-    console.log('');
+    const maxOffset = stringWidth(maxOption) - maxOption.length;
+
+    const padded = messages.map(({ help, mergedOption, offset }) => {
+      // 防止 option 出现中文则右侧的提示无法对齐
+      const paddingLength = maxOffset - offset;
+
+      return {
+        help,
+
+        mergedOption: pad(mergedOption, maxLength + paddingLength),
+      }
+    });
+
+    for (const { mergedOption, help } of padded) {
+      console.log(
+        `  ${GREEN}${mergedOption}${EOS}    ${help}`,
+      );
+    }
   }
 
   /**
@@ -330,4 +373,13 @@ exports.CLI = class CLI {
   showVersion() {
     console.log(this.versionTips)
   }
+}
+
+/**
+ *
+ * @param {string} str
+ * @param {number} maxLength
+ */
+function pad(str, maxLength) {
+  return str.padEnd(maxLength, ' ')
 }
