@@ -1,5 +1,5 @@
 const { GREEN, EOS, BOLD, CYAN_BRIGHT } = require('./constants/colors')
-const { last, isString, isFunction, isRemoteFile } = require('./utils/lite-lodash')
+const { last, isString, isFunction } = require('./utils/lite-lodash')
 const { minimist } = require('./utils/minimist')
 
 exports.CLI = class CLI {
@@ -35,7 +35,7 @@ exports.CLI = class CLI {
 
     /**
      * @private
-     * @type {Array<{ name: string; helpTips: string; execute: (options: IParsedOptions) => any }>}
+     * @type {Array<{ name: string; usage: string; execute: (options: IParsedOptions) => any }>}
      */
     this.commands = [];
 
@@ -317,8 +317,8 @@ exports.CLI = class CLI {
    * @private
    */
   showAllCommandUsageTips() {
-    const cmdTips = this.commands.map(({ name }) => {
-      return '  ' + (`${this.pkg.name} ${name} [OPTIONS]`);
+    const cmdTips = this.commands.map(({ name, usage }) => {
+      return '  ' + (usage || `${this.pkg.name} ${name} [OPTIONS]`);
     }).join('\n');
 
     cmdTips && console.log(cmdTips);
