@@ -76,4 +76,4 @@ READ more options in [CLI.test.js](https://github.com/legend80s/cli-aid/blob/mai
 ## TODO
 
 - [ ] cmd options
-- [ ] cmd help msg
+- [x] cmd help msg
