@@ -37,7 +37,7 @@ exports.CLI = class CLI {
 
     /**
      * @private
-     * @type {Array<{ name: string; usage: string; execute: (options: IParsedOptions) => any }>}
+     * @type {Array<{ name: string; help: string; usage: string; execute: (options: IParsedOptions) => any }>}
      */
     this.commands = [];
 
@@ -287,8 +287,23 @@ exports.CLI = class CLI {
     }
 
     console.log('');
+    this.printCommands();
+
+    console.log('');
     this.printOptions();
     console.log('');
+  }
+
+  /**
+   * @private
+   */
+  printCommands() {
+    console.log(`${BOLD}Commands${EOS}`);
+
+    printArrayNeatly(this.commands, ({ name, help, usage }) => ({
+      key: name,
+      value: help || usage,
+    }));
   }
 
   /**
@@ -297,50 +312,14 @@ exports.CLI = class CLI {
   printOptions() {
     console.log(`${BOLD}Options${EOS}`);
 
-    /**
-     * @type {Array<{ mergedOption: string; help: string; offset: number }>}
-     */
-    let messages = [];
-    let maxOption = '';
-    let maxLength = 0;
-
-    for (const option of this.schema) {
+    printArrayNeatly(this.schema, (option) => {
       const [key, ...alias] = option.filter(isString);
       const { help } = last(option);
 
       const mergedOption = `--${key}${alias.length ? ', -' + alias.join(', -') : ''}`;
 
-      const length = mergedOption.length;
-
-      if (length > maxLength) {
-        maxOption = mergedOption;
-
-        maxLength = length;
-      }
-
-      // console.log('mergedOption:', mergedOption, 'length', length, 'stringWidth', stringWidth(mergedOption));
-
-      messages.push({ mergedOption, help, offset: stringWidth(mergedOption) - length });
-    }
-
-    const maxOffset = stringWidth(maxOption) - maxOption.length;
-
-    const padded = messages.map(({ help, mergedOption, offset }) => {
-      // 防止 option 出现中文则右侧的提示无法对齐
-      const paddingLength = maxOffset - offset;
-
-      return {
-        help,
-
-        mergedOption: pad(mergedOption, maxLength + paddingLength),
-      }
+      return { key: mergedOption, value: help };
     });
-
-    for (const { mergedOption, help } of padded) {
-      console.log(
-        `  ${GREEN}${mergedOption}${EOS}    ${help}`,
-      );
-    }
   }
 
   /**
@@ -380,6 +359,60 @@ exports.CLI = class CLI {
  * @param {string} str
  * @param {number} maxLength
  */
-function pad(str, maxLength) {
+function padStr(str, maxLength) {
   return str.padEnd(maxLength, ' ')
+}
+
+/**
+ * @param {Array<{ key: string; value: string }>} arr
+ * @param {(obj: object) => { key: string; value: string; }} format
+ * @returns {void}
+ */
+function printArrayNeatly(arr, format) {
+  const formatted = typeof format === 'function' ? arr.map(format) : arr;
+
+  padArray(formatted).forEach(({ key, value }) => {
+    console.log(
+      `  ${GREEN}${key}${EOS}    ${value}`,
+    );
+  })
+}
+
+/**
+ * @param {Array<{ key: string; value: string }>} arr
+ * @returns {Array<{ key: string; value: string }>} key padded arr
+ */
+function padArray(arr) {
+  /**
+   * @type {typeof arr}
+   */
+  let itemsWithOffset = [];
+  let maxKey = '';
+  let maxLength = 0;
+
+  for (const { key, value } of arr) {
+    const length = key.length;
+
+    if (length > maxLength) {
+      maxKey = key;
+      maxLength = length;
+    }
+
+    itemsWithOffset.push({ key, value, offset: stringWidth(key) - length });
+  }
+
+  const maxOffset = stringWidth(maxKey) - maxKey.length;
+
+  const padded = itemsWithOffset.map(({ value, key, offset }) => {
+    // 防止 key 出现中文则右侧的提示无法对齐
+    const paddingLength = maxOffset - offset;
+
+    return {
+      key: padStr(key, maxLength + paddingLength),
+
+      value,
+    }
+  });
+
+  return padded;
 }
