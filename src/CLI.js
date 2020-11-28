@@ -1,6 +1,6 @@
 const stringWidth = require('string-width');
 
-const { GREEN, EOS, BOLD, CYAN_BRIGHT } = require('./constants/colors')
+const { GREEN, EOS, BOLD, CYAN_BRIGHT, YELLOW, chalk } = require('./constants/colors')
 const { last, isString, isFunction } = require('./utils/lite-lodash')
 const { minimist } = require('./utils/minimist')
 
@@ -14,9 +14,17 @@ exports.CLI = class CLI {
   /**
    * @type {Array<[...string[], { default: any; help: string; }]>}
    */
-  static defaultSchema = [
+  static DEFAULT_SCHEMA = [
     ['help', 'h', 'docs', '帮助', { default: false, help: 'Show this help information.' }],
     ['version', 'v', { default: false, help: 'Show the version information.' }],
+  ]
+
+  /**
+   * @type {Array<{ name: string; help: string; usage: string; execute: (options: IParsedOptions) => any }>}
+   */
+  static DEFAULT_COMMANDS = [
+    { name: 'help', help: 'Show this help information.' },
+    { name: 'version', help: 'Print version.' },
   ]
 
   /**
@@ -27,7 +35,13 @@ exports.CLI = class CLI {
      * @private
      * @type {Array<[...string[], { default: any; help: string; }]>}
      */
-    this.schema = [...CLI.defaultSchema, ...schema];
+    this.schema = [...CLI.DEFAULT_SCHEMA, ...schema];
+
+    /**
+     * parsed options. cache for command options.
+     * @private
+     */
+    this._minimist = {};
 
     /**
      * @private
@@ -37,9 +51,8 @@ exports.CLI = class CLI {
 
     /**
      * @private
-     * @type {Array<{ name: string; help: string; usage: string; execute: (options: IParsedOptions) => any }>}
      */
-    this.commands = [];
+    this.commands = [...CLI.DEFAULT_COMMANDS];
 
     const packageInfo = { name, version };
 
@@ -134,7 +147,7 @@ exports.CLI = class CLI {
    * @returns {CLI}
    */
   option(...schemaEntry) {
-    this.schema.push([...schemaEntry])
+    this.schema.push([...schemaEntry]);
 
     return this;
   }
@@ -144,19 +157,25 @@ exports.CLI = class CLI {
    *
    * @public
    *
-   * @param cmd
-   * @param {{ help: string; usage: string; }} options
+   * @param {string} cmd
+   * @param {{ help: string; usage: string; options: Array<[...string[], { default?: unknown; help?: string; }]> }} settings
    * @param {(options: Record<string, any>) => void} execute
    */
-  command(cmd = '', options, execute = () => {}) {
-    if (!cmd || !isString(cmd)) {
-      console.warn('`cmd` not a string, command won\'t be executed');
+  command(cmd = '', settings, execute) {
+    // console.log({ cmd, options, execute });
 
-      return;
+    if (!isString(cmd)) {
+      console.warn(chalk.yellow(
+        'Register command failed: the first param must be a string as it is a command name,',
+        'but', typeof cmd, 'passed.',
+        'command ignored',
+      ));
+
+      return this;
     }
 
-    if (isFunction(options)) {
-      execute = options;
+    if (isFunction(settings)) {
+      execute = settings;
     }
 
     const command = {
@@ -164,14 +183,37 @@ exports.CLI = class CLI {
       execute,
     };
 
-    if (typeof options === 'object' && options) {
-      const { help = '', usage = '' } = options;
+    if (!isFunction(command.execute)) {
+      console.warn(chalk.yellow(
+        `Register command \`${command.name}\` failed: the last param must be a function,`,
+        'but', typeof command.execute, 'passed.',
+        'command',
+        `\`${command.name}\``,
+        'ignored.',
+      ));
+
+      return this;
+    }
+
+    if (typeof settings === 'object' && settings) {
+      const { help = '', usage = '', options = [] } = settings;
 
       command.help = help;
       command.usage = usage;
+      command.schema = options;
     }
 
-    this.commands.push(command);
+    const idx = this.commands.findIndex(({ name }) => name === command.name);
+
+    // console.log('register command:', command, 'idx', idx);
+
+    if (idx !== -1) {
+      this.commands.splice(idx, 1, command)
+    } else {
+      this.commands.push(command);
+    }
+
+    // console.log('this.commands:', this.commands);
 
     return this;
   }
@@ -184,14 +226,18 @@ exports.CLI = class CLI {
    */
   parse(argv = [], config) {
     const parsed = minimist(argv, config);
-    const argEntries = this.parseAgainstSchema(parsed);
+    const argEntries = this.parseAgainstSchema(parsed, this.schema);
 
     // console.log('argEntries:', argEntries);
 
-    this.parsed = {
+    this._minimist = parsed;
+
+    this.parsed = Object.create(null);
+
+    Object.assign(this.parsed, {
       ...argEntries,
       _: parsed._,
-    };
+    });
 
     this.after(this.parsed);
 
@@ -200,11 +246,11 @@ exports.CLI = class CLI {
 
   /**
    * @private
-   *
+   * @param {typeof this.schema} schema
    * @param {Record<string, string | boolean | number | any[]>} parsedEntries
    */
-  parseAgainstSchema(parsedEntries) {
-    return this.schema.reduce((acc, option) => {
+  parseAgainstSchema(parsedEntries, schema) {
+    return schema.reduce((acc, option) => {
       const key = Object.keys(parsedEntries).find(key => option.includes(key));
       const val = parsedEntries[key];
 
@@ -224,24 +270,51 @@ exports.CLI = class CLI {
   /**
    * @private
    *
-   * @param {{ help: boolean; version: boolean; }} parsed
+   * @param {{ help: boolean; version: boolean;, _: string[] }} parsed
    */
   after(parsed) {
-    if (parsed.help) {
+    // console.log('parsed:', parsed, '\nthis._minimist', this._minimist);
+
+    const cmdName = parsed._[0];
+    const cmd = this.commands.find(({ name }) => name === cmdName);
+
+    if (cmd && cmd.execute) {
+      const argEntries = this.parseAgainstSchema(this._minimist, cmd.schema);
+
+      const commandParsedOptions = {
+        ...argEntries,
+        _: this._minimist._,
+      };
+
+      cmd.execute(commandParsedOptions)
+
+      return this;
+    }
+
+    if (parsed.help || parsed._[0] === 'help') {
       this.showHelp();
 
       process.exit(0);
     }
 
-    if (parsed.version) {
+    if (parsed.version || parsed._[0] === 'version') {
       this.showVersion();
 
       process.exit(0);
     }
 
-    const cmd = this.commands.find(cmd => this.hasCmd(cmd))
+    if (parsed._.length) {
+      console.warn(chalk.yellow(
+        `${this.pkg.name} ${cmdName}: unknown command`,
+        `\nRun '${this.pkg.name} help' for usage.`,
+      ));
 
-    cmd && cmd.execute(parsed);
+      return this;
+    }
+
+    const notConfiguredFlag = Object.keys(this._minimist).find(key => !Object.keys(this.parsed).includes(key));
+
+    console.warn(chalk.yellow(`flag provided but not defined: -${notConfiguredFlag}`));
 
     return this;
   }
@@ -250,7 +323,7 @@ exports.CLI = class CLI {
    * if have cmd in argv
    * @private
    */
-  hasCmd(cmd) {
+  hasCmd = (cmd) => {
     return this.parsed._.includes(cmd.name);
   }
 
@@ -265,14 +338,13 @@ exports.CLI = class CLI {
    * @private
    */
   showHelp() {
-    const cmd = this.commands.find(cmd =>
-      this.hasCmd(cmd)
-    );
+    const commands = this.commands.filter(this.hasCmd);
 
-    // console.log('cmd:', cmd);
-
-    if (cmd) {
-      this.showCommandUsageTips(cmd)
+    // case: cli-name help base64
+    if (commands.length > 1) {
+      // commands[0] is help
+      // commands[1] is the target command
+      this.showCommandHelp(commands[1] || cmd)
 
       return;
     }
@@ -290,7 +362,7 @@ exports.CLI = class CLI {
     this.printCommands();
 
     console.log('');
-    this.printOptions();
+    this.printOptions(this.schema);
     console.log('');
   }
 
@@ -304,15 +376,19 @@ exports.CLI = class CLI {
       key: name,
       value: help || usage,
     }));
+
+    console.log();
+
+    console.log(`Use "${this.pkg.name} help <command>" for more information about a command.`);
   }
 
   /**
    * @private
    */
-  printOptions() {
+  printOptions(schema) {
     console.log(`${BOLD}Options${EOS}`);
 
-    printArrayNeatly(this.schema, (option) => {
+    printArrayNeatly(schema, (option) => {
       const [key, ...alias] = option.filter(isString);
       const { help } = last(option);
 
@@ -325,22 +401,37 @@ exports.CLI = class CLI {
   /**
    * @private
    */
-  showCommandUsageTips(cmd) {
+  showCommandHelp(cmd) {
     console.log(cmd.help);
     console.log();
-
     console.log(`${BOLD}Usage${EOS}`);
     console.log(' ', cmd.usage);
 
-    console.log();
+    if (cmd.schema.length) {
+      console.log('');
+      this.printOptions(cmd.schema);
+      console.log('');
+    }
   }
 
   /**
    * @private
    */
   showAllCommandUsageTips() {
+    const resolveOptions = (name) => {
+      if (name === 'help') {
+        return '<commands>';
+      }
+
+      if (name === 'version') {
+        return '';
+      }
+
+      return '[OPTIONS]';
+    };
+
     const cmdTips = this.commands.map(({ name, usage }) => {
-      return '  ' + (usage || `${this.pkg.name} ${name} [OPTIONS]`);
+      return '  ' + (usage || `${this.pkg.name} ${name} ` + resolveOptions(name) );
     }).join('\n');
 
     cmdTips && console.log(cmdTips);

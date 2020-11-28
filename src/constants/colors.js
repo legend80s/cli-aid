@@ -8,6 +8,12 @@ const BOLD = '\x1b[1m';
 const EOS = '\x1b[0m';
 
 module.exports = {
+  chalk: {
+    yellow: (...args) => {
+      return `${YELLOW}${args.join(' ')}${EOS}`
+    },
+  },
+
   RED,
   GREEN,
   YELLOW,
