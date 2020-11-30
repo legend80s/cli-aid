@@ -1,8 +1,8 @@
 const stringWidth = require('string-width');
 
-const { GREEN, EOS, BOLD, CYAN_BRIGHT, YELLOW, chalk } = require('./constants/colors')
+const { GREEN, EOS, BOLD, CYAN_BRIGHT, chalk } = require('./constants/colors')
 const { last, isString, isFunction } = require('./utils/lite-lodash')
-const { minimist } = require('./utils/minimist')
+const { minimist, parseUsage } = require('./utils/minimist')
 
 exports.CLI = class CLI {
   static toString = String
@@ -31,6 +31,9 @@ exports.CLI = class CLI {
    * @param {{ name: string; version: string; schema: [...string[], { default: any; }]; }} options
    */
   constructor({ name, version, schema = [] } = {}) {
+    /** @private */
+    this.unknownCommandAllowed = true;
+
     /**
      * @private
      * @type {Array<[...string[], { default: any; help: string; }]>}
@@ -42,6 +45,13 @@ exports.CLI = class CLI {
      * @private
      */
     this._minimist = {};
+
+    /**
+     * @private
+     * Example: `node example-cli.js hello -- world`.
+     * Then the `hello`, `world` are the positional arguments.
+     */
+    this.positionalArgs = [];
 
     /**
      * @private
@@ -81,6 +91,12 @@ exports.CLI = class CLI {
       .setVersion(packageInfo);
   }
 
+  settings({ unknownCommandAllowed = true } = {}) {
+    this.unknownCommandAllowed = unknownCommandAllowed;
+
+    return this;
+  }
+
   /**
    * set package.json
    *
@@ -106,7 +122,7 @@ exports.CLI = class CLI {
    * @returns {CLI}
    */
   setUsageTips({ name }) {
-    this.usageTips = name ? `${name} [OPTIONS]` : '';
+    this.usageTips = name ? `${name} [options]` : '';
 
     return this;
   }
@@ -231,12 +247,13 @@ exports.CLI = class CLI {
     // console.log('argEntries:', argEntries);
 
     this._minimist = parsed;
+    this.positionalArgs = parsed._;
 
     this.parsed = Object.create(null);
 
     Object.assign(this.parsed, {
       ...argEntries,
-      _: parsed._,
+      _: this.positionalArgs,
     });
 
     this.after(this.parsed);
@@ -275,46 +292,71 @@ exports.CLI = class CLI {
   after(parsed) {
     // console.log('parsed:', parsed, '\nthis._minimist', this._minimist);
 
-    const cmdName = parsed._[0];
+    const cmdName = this.positionalArgs[0];
     const cmd = this.commands.find(({ name }) => name === cmdName);
 
     if (cmd && cmd.execute) {
       const argEntries = this.parseAgainstSchema(this._minimist, cmd.schema);
 
+      const {
+        requiredValues,
+        missingFields,
+      } = parseUsage(cmd.usage, this.positionalArgs);
+
       const commandParsedOptions = {
         ...argEntries,
-        _: this._minimist._,
+        ...requiredValues,
+        _: this.positionalArgs,
       };
 
-      cmd.execute(commandParsedOptions)
+      if (missingFields.length) {
+        console.error(chalk.red('`' + missingFields.join('` `') + '`', 'required. Usage:', cmd.usage))
+
+        return process.exit(-1);
+      }
+
+      cmd.execute(commandParsedOptions);
 
       return this;
     }
 
-    if (parsed.help || parsed._[0] === 'help') {
+    if (parsed.help || this.positionalArgs[0] === 'help') {
       this.showHelp();
 
       process.exit(0);
     }
 
-    if (parsed.version || parsed._[0] === 'version') {
+    if (parsed.version || this.positionalArgs[0] === 'version') {
       this.showVersion();
 
       process.exit(0);
     }
 
-    if (parsed._.length) {
+    if (this.positionalArgs.length && !this.unknownCommandAllowed) {
       console.warn(chalk.yellow(
         `${this.pkg.name} ${cmdName}: unknown command`,
         `\nRun '${this.pkg.name} help' for usage.`,
       ));
 
-      return this;
+      return process.exit(-1);
+    }
+
+    // check the required fields when positional args not provided
+    if (this.positionalArgs.length === 0) {
+      const { missingFields } = parseUsage(this.usageTips, this.positionalArgs);
+
+      if (missingFields.length) {
+        console.error(
+          chalk.red(`\`${missingFields.join('` `')}\` required. Usage:`, this.usageTips)
+        );
+
+        return process.exit(-1);
+      }
     }
 
     const notConfiguredFlag = Object.keys(this._minimist).find(key => !Object.keys(this.parsed).includes(key));
 
-    console.warn(chalk.yellow(`flag provided but not defined: -${notConfiguredFlag}`));
+    notConfiguredFlag && console.warn(chalk.yellow(`flag provided but not defined: -${notConfiguredFlag}`));
 
     return this;
   }
@@ -420,14 +462,14 @@ exports.CLI = class CLI {
   showAllCommandUsageTips() {
     const resolveOptions = (name) => {
       if (name === 'help') {
-        return '<commands>';
+        return '[commands]';
       }
 
       if (name === 'version') {
         return '';
       }
 
-      return '[OPTIONS]';
+      return '[options]';
     };
 
     const cmdTips = this.commands.map(({ name, usage }) => {

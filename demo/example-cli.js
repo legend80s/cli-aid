@@ -1,27 +1,3 @@
-# cli-aid
-
-> A Beautiful 💅 and Lightweight 🚀 CLI-App Factory.
-
-<p>
-  <a href="https://www.npmjs.com/package/cli-aid">
-    <img src="https://img.shields.io/npm/v/cli-aid.svg" alt="npm version" />
-  </a>
-  <a href="https://www.npmjs.com/package/cli-aid">
-    <img src="https://img.shields.io/npm/dm/cli-aid.svg" alt="npm downloads" />
-  </a>
-  <a href="https://packagephobia.now.sh/result?p=cli-aid" rel="nofollow">
-    <img src="https://packagephobia.now.sh/badge?p=cli-aid" alt="Install Size">
-  </a>
-  <a href="https://github.com/legend80s/cli-aid/blob/main/test/CLI.test.js">
-    <img src="https://badgen.net/badge/passed/jest/green" alt="jest" />
-  </a>
-</p>
-
-## Use
-
-[github demo/example-cli.js](https://github.com/legend80s/cli-aid/blob/main/demo/example-cli.js).
-
-```javascript
 const { CLI } = require('../src');
 
 const pkg = {
@@ -30,8 +6,12 @@ const pkg = {
   description: 'A example cli to show you the power of cli-aid.',
 };
 
-new CLI()
+// console.log('process.argv.slice(2):', process.argv.slice(2));
+
+const argv = new CLI()
+  .settings({ unknownCommandAllowed: true })
   .package(pkg)
+  .usage('tinify <IMG_URL_OR_LOCAL_IMG_PATH...> [OPTIONS]')
   .option('dry-run', {
     default: false,
     help: 'Does everything compress would do except actually compressing. Reports the details of what would have been compressed.',
@@ -39,6 +19,10 @@ new CLI()
   .option('max-count', 'm', 'c', {
     default: 15,
     help: 'The max compressing turns. Default 15.',
+  })
+  .option('verbose', {
+    default: false,
+    help: 'Show detailed information about the process of compressing.',
   })
 
   // with one field required and a verbose option
@@ -96,51 +80,16 @@ new CLI()
   })
 
   .parse(process.argv.slice(2));
-```
 
-`node demo/example-cli.js help`
+main(argv);
 
-todo
+function main(argv) {
+  console.log(
+    'start compressing', argv._,
+    'with max-count:', argv['max-count'],
+    'and dry-run flag set to', argv['dry-run'],
+    'and verbose flag set to', argv.verbose,
+  );
 
-
-
-`node demo/example-cli.js help base64`
-
-```sh
-Output base64-encoded string of the input text.
-
-Usage
-  tinify base64 <text>
-
-Options
-  --verbose, -v    Show detailed information.
-```
-
-`node demo/example-cli.js base64`
-
-```sh
-`text` required. Usage: tinify base64 <text>
-```
-
-`node demo/example-cli.js base64 helloworld`
-
-```sh
-output base64 for text "helloworld"
-aGVsbG93b3JsZA==
-```
-
-`node demo/example-cli.js base64 helloworld -v`
-
-```sh
-output base64 for text "helloworld"
-aGVsbG93b3JsZA==
-
-options: { verbose: true, text: 'helloworld', _: [ 'base64', 'helloworld' ] }
-```
-
-READ more options in [CLI.test.js](https://github.com/legend80s/cli-aid/blob/main/test/CLI.test.js) and command in [demo/example-cli.js](https://github.com/legend80s/cli-aid/blob/main/demo/example-cli.js).
-
-## TODO
-
-- [x] cmd options
-- [x] cmd help msg
+  argv.verbose && console.log('\nargv:', argv);
+}

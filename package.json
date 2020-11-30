@@ -1,21 +1,31 @@
 {
   "name": "cli-aid",
   "version": "6.2.1",
-  "description": "Lightweight CLI-App Factory based on process-yargs-parser 🚀.",
+  "description": "A Beautiful 💅 and Lightweight 🚀 CLI-App Factory.",
   "main": "./src/index.js",
   "files": [
     "src/*"
   ],
   "scripts": {
     "preversion": "npm test",
-    "test": "jest && npm run test:e2e",
-    "test:e2e": "node demo/tinify-client-cli.js -v && node demo/tinify-client-cli.js -h"
+    "jest": "jest",
+    "test": "npm run jest && npm run test:e2e",
+    "test:e2e": "node demo/example-cli.js -v && node demo/example-cli.js -h"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/legend80s/cli-aid.git"
   },
-  "keywords": [],
+  "keywords": [
+    "cli",
+    "command line",
+    "command",
+    "argument",
+    "args",
+    "option",
+    "parser",
+    "parsing"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {

@@ -12,6 +12,10 @@ module.exports = {
     yellow: (...args) => {
       return `${YELLOW}${args.join(' ')}${EOS}`
     },
+
+    red: (...args) => {
+      return `${RED}${args.join(' ')}${EOS}`
+    },
   },
 
   RED,
