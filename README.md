@@ -19,10 +19,8 @@
 
 ## Use
 
-[github demo/example-cli.js](https://github.com/legend80s/cli-aid/blob/main/demo/example-cli.js).
-
 ```javascript
-const { CLI } = require('../src');
+const { CLI } = require('cli-aid');
 
 const pkg = {
   name: 'example-cli',
@@ -100,9 +98,33 @@ new CLI()
 
 `node demo/example-cli.js help`
 
-todo
+```sh
+example-cli/7.0.0
 
+A example cli to show you the power of cli-aid.
 
+Usage
+  tinify <IMG_URL_OR_LOCAL_IMG_PATH...> [OPTIONS]
+  example-cli help [commands]
+  example-cli version
+  tinify base64 <text>
+  tinify set-key <key> <mode>
+
+Commands
+  help       Show this help information.
+  version    Print example-cli version.
+  base64     Output base64-encoded string of the input text.
+  set-key    Set the tinify key.
+
+Use "example-cli help <command>" for more information about a command.
+
+Options
+  --help, -h, -docs, -帮助    Show this help information.
+  --version, -v               Show the version information.
+  --dry-run                   Does everything compress would do except actually compressing. Reports the details of what would have been compressed.
+  --max-count, -m, -c         The max compressing turns. Default 15.
+  --verbose                   Show detailed information about the process of compressing.
+```
 
 `node demo/example-cli.js help base64`
 
@@ -125,14 +147,14 @@ Options
 `node demo/example-cli.js base64 helloworld`
 
 ```sh
-output base64 for text "helloworld"
+# output base64 for text "helloworld"
 aGVsbG93b3JsZA==
 ```
 
 `node demo/example-cli.js base64 helloworld -v`
 
 ```sh
-output base64 for text "helloworld"
+# output base64 for text "helloworld"
 aGVsbG93b3JsZA==
 
 options: { verbose: true, text: 'helloworld', _: [ 'base64', 'helloworld' ] }
