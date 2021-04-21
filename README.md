@@ -17,9 +17,9 @@
   </a>
 </p>
 
-- [x] ℹ️ show default help and version information
-- [x] 🚀 option alias
-- [x] 🗣 cmd inclusive options, can be optional or required
+- [x] Show default help and version information ℹ️
+- [x] Option alias 🚀
+- [x] Command inclusive options, can be optional or required 🗣
 
 ## Use
 
