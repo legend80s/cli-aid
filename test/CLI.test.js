@@ -251,6 +251,48 @@ describe('CLI', () => {
     });
   });
 
+  test('should parse as expected on command set', () => {
+    let actualCommandOptions;
+
+    const cli = new CLI()
+      .option('verbose')
+      .command('base64', {
+        usage: 'example-cli base64 IMG_URL_OR_LOCAL_IMG_PATH',
+        help: 'output base64-encoded string of the input image',
+
+        options: [
+          [
+            'verbose-cmd',
+            {
+              default: false,
+              help: 'Print more information for debugging.',
+            }
+          ],
+        ]
+      }, (options) => {
+        // console.log('output base64 with options:', options);
+
+        actualCommandOptions = options;
+      });
+
+    const actual = cli.parse([ 'base64', 'https://example.com/example.png', '--verbose-cmd' ]);
+
+    const expected = {
+      help: false,
+      version: false,
+      verbose: undefined,
+
+      _: ['base64', 'https://example.com/example.png'],
+    };
+
+    expect(actual).toEqual(expected);
+
+    expect(actualCommandOptions).toEqual({
+      'verbose-cmd': true,
+      _: ['base64', 'https://example.com/example.png'],
+    });
+  });
+
   test('should not execute on unknown command passed', () => {
     let actualOptions = null;
 
