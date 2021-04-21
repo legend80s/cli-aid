@@ -19,6 +19,24 @@
 
 ## Use
 
+```js
+const { CLI } = require('cli-aid');
+
+new CLI()
+  .package(pkg)
+  .option('dry-run', {
+    default: false,
+    help: 'Does everything compress would do except actually compressing. Reports the details of what would have been compressed.',
+  })
+  .option('max-count', 'm', 'c', {
+    default: 15,
+    help: 'The max compressing turns. Default 15.',
+  })
+  .parse(process.argv.slice(2));
+```
+
+## More Detailed Examples
+
 ```javascript
 const { CLI } = require('cli-aid');
 
