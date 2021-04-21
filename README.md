@@ -16,7 +16,8 @@
     <img src="https://badgen.net/badge/passed/jest/green" alt="jest" />
   </a>
 </p>
-- [x] ℹ️ show default help and version information
+
+- [x] ℹ️ show default help and version information
 - [x] 🚀 option alias
 - [x] 🗣 cmd inclusive options, can be optional or required
 
