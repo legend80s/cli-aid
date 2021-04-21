@@ -41,13 +41,15 @@ new CLI()
 
 ## Examples
 
-cmd inclusive options
+Command inclusive and required options.
 
 ```js
-.command('version', {
-  usage: `${pkg.name} version`,
-  help: `Print ${pkg.name} version.`,
+.command('base64', {
+  // text is required
+  usage: 'tinify base64 <text>',
+  help: 'Output base64-encoded string of the input text.',
 
+  // cmd inclusive options
   options: [
     ['verbose', 'v', { help: 'Show detailed information.' }],
   ],
