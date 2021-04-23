@@ -31,7 +31,7 @@ describe('CLI', () => {
         'https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ',
         '--output=./alipay-logo-2.png',
         '--debug',
-      ]);
+      ], { "camel-case-expansion": false });
 
     const expected = mapToObject(new Map([
       ['key', undefined],
@@ -53,7 +53,7 @@ describe('CLI', () => {
 
   test('should parse boolean val as expected', () => {
     const actual = new CLI({ name: 'tinify-client', version: '2.0.0' })
-      .option('in-place', 'i', { default: false, help: 'Overwrite the original image. Default false' })
+      .option('inPlace', 'i', { default: false, help: 'Overwrite the original image. Default false' })
 
       .parse([
         'https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ',
@@ -61,7 +61,7 @@ describe('CLI', () => {
       ]);
 
     const expected = mapToObject(new Map([
-      ['in-place', true],
+      ['inPlace', true],
 
       ['help', false],
       ['version', false],
@@ -78,7 +78,7 @@ describe('CLI', () => {
       .parse([
         'https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ',
         '--in-place=true'
-      ]);
+      ], { "camel-case-expansion": false });
 
     const expected = mapToObject(new Map([
       ['in-place', 'true'],
@@ -98,7 +98,7 @@ describe('CLI', () => {
       .parse([
         'https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ',
         '--in-place=true'
-      ]);
+      ], { "camel-case-expansion": false });
 
     const expected = mapToObject(new Map([
       ['in-place', true],
@@ -118,7 +118,7 @@ describe('CLI', () => {
       .parse([
         'https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ',
         '--in-place=false'
-      ]);
+      ], { "camel-case-expansion": false });
 
     const expected = mapToObject(new Map([
       ['in-place', false],
@@ -138,7 +138,7 @@ describe('CLI', () => {
       .parse([
         'https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ',
         '--in-place=hello'
-      ]);
+      ], { "camel-case-expansion": false });
 
     const expected = mapToObject(new Map([
       ['in-place', false],
@@ -168,7 +168,7 @@ describe('CLI', () => {
         'https://gw.alipayobjects.com/mdn/member_frontWeb/afts/img/A*h7o9Q4g2KiUAAAAAAAAAAABkARQnAQ',
         '--output=./alipay-logo-2.png',
         '--debug',
-      ]);
+      ], { "camel-case-expansion": false });
 
     const expected = mapToObject(new Map([
       ['key', undefined],
@@ -289,6 +289,7 @@ describe('CLI', () => {
 
     expect(actualCommandOptions).toEqual({
       'verbose-cmd': true,
+      'verboseCmd': true,
       _: ['base64', 'https://example.com/example.png'],
     });
   });
@@ -337,7 +338,7 @@ describe('CLI', () => {
         '--in-place=hello',
         '-x=1',
         '-x=2',
-      ], { "duplicate-arguments-array": true });
+      ], { "duplicate-arguments-array": true, "camel-case-expansion": false });
 
     // console.log('actual:', actual);
 
