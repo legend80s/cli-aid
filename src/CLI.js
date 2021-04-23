@@ -1,4 +1,5 @@
 const stringWidth = require('string-width');
+const { camelCase } = require('process-yargs-parser/src/lib');
 
 const { GREEN, EOS, BOLD, CYAN_BRIGHT, chalk } = require('./constants/colors')
 const { last, isString, isFunction } = require('./utils/lite-lodash')
@@ -58,6 +59,14 @@ exports.CLI = class CLI {
      * @type {{ _: string[]; help: boolean; version: boolean; }}
      */
     this.parsed = Object.create(null);
+
+    /**
+     * @private
+     * @type {import('.').IParsedConfig}
+     */
+    this.parserConfig = {
+      "camel-case-expansion": true,
+    };
 
     /**
      * @private
@@ -174,7 +183,7 @@ exports.CLI = class CLI {
    * @public
    *
    * @param {string} cmd
-   * @param {{ help: string; usage: string; options: Array<[...string[], { default?: unknown; help?: string; }]> }} settings
+   * @param {{ help: string; usage: string; options: Array<import('.').ICmdOpt> }} settings
    * @param {(options: Record<string, any>) => void} execute
    */
   command(cmd = '', settings, execute) {
@@ -238,12 +247,18 @@ exports.CLI = class CLI {
    * @public
    *
    * @param {string[]} argv
+   * @param {import('.').IParsedConfig} config
    * @returns {Record<string, any>}
    */
   parse(argv = [], config) {
+    Object.assign(this.parserConfig, config);
+
     const parsed = minimist(argv, config);
     const argEntries = this.parseAgainstSchema(parsed, this.schema);
 
+    // console.log('argv:', argv);
+    // console.log('parsed:', parsed);
+    // console.log('this.schema:', this.schema);
     // console.log('argEntries:', argEntries);
 
     this._minimist = parsed;
@@ -267,6 +282,8 @@ exports.CLI = class CLI {
    * @param {Record<string, string | boolean | number | any[]>} parsedEntries
    */
   parseAgainstSchema(parsedEntries, schema) {
+    // console.log('parsedEntries:', parsedEntries);
+    // console.log('schema:', schema);
     return schema.reduce((acc, option) => {
       const key = Object.keys(parsedEntries).find(key => option.includes(key));
       const val = parsedEntries[key];
@@ -274,13 +291,25 @@ exports.CLI = class CLI {
       const { default: defaultVal } = last(option);
       const [ normalizedKey ] = option;
 
-      return {
+      const normalizedValue = typeof val === 'undefined' ?
+        defaultVal :
+        (typeof defaultVal === 'boolean' ? CLI.toBoolean(val) : val)
+
+      const result = {
         ...acc,
 
-        [normalizedKey]: typeof val === 'undefined' ?
-          defaultVal :
-          ( typeof defaultVal === 'boolean' ? CLI.toBoolean(val) : val ),
+        [normalizedKey]: normalizedValue,
       };
+
+      if (this.parserConfig['camel-case-expansion']) {
+        const camelCased = camelCase(normalizedKey);
+
+        if (camelCased !== normalizedKey) {
+          result[camelCased] = normalizedValue;
+        }
+      }
+
+      return result;
     }, Object.create(null));
   }
 
@@ -296,6 +325,7 @@ exports.CLI = class CLI {
     const cmd = this.commands.find(({ name }) => name === cmdName);
 
     if (cmd && cmd.execute) {
+      // console.log('cmd.schema:', cmd.schema);
       const argEntries = this.parseAgainstSchema(this._minimist, cmd.schema);
 
       const {
