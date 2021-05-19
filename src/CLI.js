@@ -319,7 +319,7 @@ exports.CLI = class CLI {
    * @param {{ help: boolean; version: boolean;, _: string[] }} parsed
    */
   after(parsed) {
-    // console.log('parsed:', parsed, '\nthis._minimist', this._minimist);
+    // console.log('parsed:', parsed, '\nthis._minimist', this._minimist, '\nthis.positionalArgs:', this.positionalArgs);
 
     const cmdName = this.positionalArgs[0];
     const cmd = this.commands.find(({ name }) => name === cmdName);
@@ -338,6 +338,18 @@ exports.CLI = class CLI {
         ...requiredValues,
         _: this.positionalArgs,
       };
+
+      // console.log('commandParsedOptions:',commandParsedOptions );
+      // console.log('this.positionalArgs:',this.positionalArgs );
+
+      // node demo/example-cli.js set-key -h
+      // node demo/example-cli.js set-key help
+      // node demo/example-cli.js help set-key
+      if (parsed.help || commandParsedOptions.help || this.positionalArgs[1] === 'help') {
+        this.showHelp();
+
+        return process.exit(0);
+      }
 
       if (missingFields.length) {
         console.error(chalk.red('`' + missingFields.join('` `') + '`', 'required. Usage:', cmd.usage))
@@ -462,7 +474,7 @@ exports.CLI = class CLI {
 
     printArrayNeatly(schema, (option) => {
       const [key, ...alias] = option.filter(isString);
-      const { help } = last(option);
+      const { help = '' } = last(option);
 
       const mergedOption = `--${key}${alias.length ? ', -' + alias.join(', -') : ''}`;
 

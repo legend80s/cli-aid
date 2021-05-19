@@ -51,6 +51,12 @@ const argv = new CLI()
   .command('set-key', {
     usage: 'tinify set-key <key> <mode>',
     help: 'Set the tinify key.',
+
+    options: [
+      [
+        'verbose',
+      ],
+    ],
   }, (options) => {
     console.log('set-key to', `"${options.key}"`, 'with mode', `"${options.mode}"`);
     console.log();
