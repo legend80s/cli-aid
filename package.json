@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "preversion": "npm test",
+    "postversion": "npm publish && git push && git push --tags",
     "jest": "jest",
     "test": "npm run jest && npm run test:e2e",
     "test:e2e": "node demo/example-cli.js -v && node demo/example-cli.js -h"

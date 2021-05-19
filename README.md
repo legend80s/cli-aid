@@ -197,6 +197,12 @@ option in `<option>` is required
 
 READ more options in [CLI.test.js](https://github.com/legend80s/cli-aid/blob/main/test/CLI.test.js) and command in [demo/example-cli.js](https://github.com/legend80s/cli-aid/blob/main/demo/example-cli.js).
 
+## Publish
+
+```sh
+npm version major / minor / patch
+```
+
 ## TODO
 
 - [x] cmd options
