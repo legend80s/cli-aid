@@ -5,13 +5,9 @@ const { GREEN, EOS, BOLD, CYAN_BRIGHT, chalk } = require('./constants/colors')
 const { last, isString, isFunction } = require('./utils/lite-lodash')
 const { minimist, parseUsage } = require('./utils/minimist')
 
+const toBoolean = target => target === true || target === 'true' || target === ''
+
 exports.CLI = class CLI {
-  static toString = String
-  static toBoolean = target => target === true || target === 'true' || target === ''
-  static toNumber = Number
-
-  static defaultTransformer = String
-
   /**
    * @type {Array<[...string[], { default: any; help: string; }]>}
    */
@@ -293,7 +289,7 @@ exports.CLI = class CLI {
 
       const normalizedValue = typeof val === 'undefined' ?
         defaultVal :
-        (typeof defaultVal === 'boolean' ? CLI.toBoolean(val) : val)
+        (typeof defaultVal === 'boolean' ? toBoolean(val) : val)
 
       const result = {
         ...acc,
