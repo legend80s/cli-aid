@@ -8,9 +8,7 @@ exports.minimist = parse;
  * @returns {{ requiredFields: string[]; requiredValues: Record<string, string>; missingFields: string[]; }}
  */
 exports.parseUsage = (usage, positionalArgs) => {
-  const requiredRegExp = /<([^>]+?)>/g;
-  const matches = (usage || '').matchAll(requiredRegExp);
-  const requiredFields = Array.from(matches).map(([_, field]) => field);
+  const requiredFields = parseRequiredFields(usage);
 
   // 'go   run  -v <f1> [f2]' => 1
   const cmdCount = getCommands(usage).length;
@@ -56,4 +54,21 @@ function normalize(field) {
  */
 function getCommands(usage) {
   return usage.split(/[\-\<\[]/).shift().trim().split(/ +/).slice(1);
+}
+
+function parseRequiredFields(str = '') {
+  if (!str) {
+    return [];
+  }
+
+  let matches = [];
+  const requiredRegExp = /<([^>]+?)>/g;
+
+  let result;
+
+  while (result = requiredRegExp.exec(str)) {
+    matches.push(result[1]);
+  }
+
+  return matches;
 }
