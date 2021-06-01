@@ -5,25 +5,25 @@ const { GREEN, EOS, BOLD, CYAN_BRIGHT, chalk } = require('./constants/colors')
 const { last, isString, isFunction } = require('./utils/lite-lodash')
 const { minimist, parseUsage } = require('./utils/minimist')
 
-const toBoolean = target => target === true || target === 'true' || target === ''
+const toBoolean = target => target === true || target === 'true' || target === '';
+
+/**
+ * @type {Array<[...string[], { default: any; help: string; }]>}
+ */
+const DEFAULT_SCHEMA = [
+  ['help', 'h', 'docs', '帮助', { default: false, help: 'Show this help information.' }],
+  ['version', 'v', { default: false, help: 'Show the version information.' }],
+];
+
+/**
+ * @type {Array<{ name: string; help: string; usage: string; execute: (options: IParsedOptions) => any }>}
+ */
+const DEFAULT_COMMANDS = [
+  { name: 'help', help: 'Show this help information.' },
+  { name: 'version', help: 'Print version.' },
+];
 
 exports.CLI = class CLI {
-  /**
-   * @type {Array<[...string[], { default: any; help: string; }]>}
-   */
-  static DEFAULT_SCHEMA = [
-    ['help', 'h', 'docs', '帮助', { default: false, help: 'Show this help information.' }],
-    ['version', 'v', { default: false, help: 'Show the version information.' }],
-  ]
-
-  /**
-   * @type {Array<{ name: string; help: string; usage: string; execute: (options: IParsedOptions) => any }>}
-   */
-  static DEFAULT_COMMANDS = [
-    { name: 'help', help: 'Show this help information.' },
-    { name: 'version', help: 'Print version.' },
-  ]
-
   /**
    * @param {{ name: string; version: string; schema: [...string[], { default: any; }]; }} options
    */
@@ -35,7 +35,7 @@ exports.CLI = class CLI {
      * @private
      * @type {Array<[...string[], { default: any; help: string; }]>}
      */
-    this.schema = [...CLI.DEFAULT_SCHEMA, ...schema];
+    this.schema = [...DEFAULT_SCHEMA, ...schema];
 
     /**
      * parsed options. cache for command options.
@@ -67,7 +67,7 @@ exports.CLI = class CLI {
     /**
      * @private
      */
-    this.commands = [...CLI.DEFAULT_COMMANDS];
+    this.commands = [...DEFAULT_COMMANDS];
 
     const packageInfo = { name, version };
 
