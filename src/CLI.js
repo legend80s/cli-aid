@@ -403,7 +403,7 @@ exports.CLI = class CLI {
    * if have cmd in argv
    * @private
    */
-  hasCmd = (cmd) => {
+  hasCmd(cmd) {
     return this.parsed._.includes(cmd.name);
   }
 
@@ -418,7 +418,7 @@ exports.CLI = class CLI {
    * @private
    */
   showHelp() {
-    const commands = this.commands.filter(this.hasCmd);
+    const commands = this.commands.filter(cmd => this.hasCmd(cmd));
 
     // case: cli-name help base64
     if (commands.length > 1) {
